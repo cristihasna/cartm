@@ -50,10 +50,10 @@ const styles = StyleSheet.create({
 	},
 	icon: {
 		fontSize: 20,
-		marginRight: 10,
 		color: colors.white
 	},
 	title: {
+		marginLeft: 10,
 		fontSize: 19,
 		textAlign: 'center',
 		color: colors.white
