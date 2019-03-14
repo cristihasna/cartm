@@ -13,27 +13,26 @@ export default class CredentialInput extends Component {
 	}
 
 	handleOnChange(value) {
-		console.log(`new value: ${value}`);
 		this.setState({
 			value
 		});
 	}
 
-	get value(){
+	get value() {
 		return this.state.value;
 	}
 
 	render() {
 		return (
 			<View style={styles.container}>
-				<View style={styles.iconContainer}>
+				<View style={[ styles.iconContainer, this.props.highlighted ? styles.iconContainerHighlighted : null ]}>
 					<Icon name={this.props.icon} style={styles.icon} />
 				</View>
 				<TextInput
 					style={styles.textInput}
 					onChangeText={this.handleOnChange.bind(this)}
 					value={this.state.value}
-					{...(this.props.secure ? { secureTextEntry: true } : {keyboardType: "email-address"})}
+					{...(this.props.secure ? { secureTextEntry: true } : { keyboardType: 'email-address' })}
 				/>
 			</View>
 		);
@@ -45,8 +44,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: 35,
 		flexDirection: 'row',
-		borderWidth: StyleSheet.hairlineWidth * 2,
-		borderColor: colors.darkGrey,
 		marginVertical: 5
 	},
 	iconContainer: {
@@ -55,7 +52,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: colors.purple
 	},
-	icon:{
+	iconContainerHighlighted: {
+		backgroundColor: colors.black
+	},
+	icon: {
 		fontSize: 18,
 		color: colors.white
 	},
@@ -75,5 +75,6 @@ const styles = StyleSheet.create({
 CredentialInput.propTypes = {
 	icon: PropTypes.string.isRequired,
 	secure: PropTypes.bool,
-	defaultValue: PropTypes.string
+	defaultValue: PropTypes.string,
+	highlighted: PropTypes.bool
 };

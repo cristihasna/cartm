@@ -3,7 +3,7 @@
 */
 
 export default {
-    black: '#000000',
+    black: '#262626',
     white: '#ffffff',
     purple: '#40407a',
     darkPurple: '#22223f',
