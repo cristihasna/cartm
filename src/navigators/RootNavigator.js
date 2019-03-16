@@ -1,10 +1,11 @@
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import LoginNavigator from './LoginNavigator';
-import { Home } from '../screens';
+import AppNavigator from './AppNavigator';
 
 const RootNavigator = createStackNavigator(
 	{
-		LoginNavigator
+		LoginNavigator,
+		AppNavigator
 	},
 	{
 		initialRouteName: 'LoginNavigator',
@@ -15,5 +16,3 @@ const RootNavigator = createStackNavigator(
 );
 
 export default createAppContainer(RootNavigator);
-
-

@@ -2,9 +2,12 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, KeyboardAvoidingView, ScrollView, TouchableOpacity, ToastAndroid } from 'react-native';
 import { facebookLogin, googleLogin, emailLogin } from '../lib';
 import { Logo, HorizontalSeparator, SocialLoginButton, CredentialInput } from '../components';
+import { loginUser } from '../redux/actions/loginActions';
+import { connect } from 'react-redux';
+
 import colors from '../style/colors';
 
-export default class Login extends Component {
+class Login extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -14,6 +17,10 @@ export default class Login extends Component {
 				password: false
 			}
 		};
+	}
+
+	componentWillReceiveProps(props){
+		console.log('new props', props);
 	}
 
 	_initRegistrationScreen(email, password, showMessage) {
@@ -28,6 +35,8 @@ export default class Login extends Component {
 		signinProvider()
 			.then((data) => {
 				console.log(data);
+				this.props.loginUser(data);
+				this.props.navigation.navigate('Home');
 				this.setState({
 					highlighted: {
 						email: false,
@@ -36,6 +45,7 @@ export default class Login extends Component {
 				});
 			})
 			.catch((data) => {
+				console.log(data);
 				if (data.code === 'auth/account-exists-with-different-credential')
 					alert(
 						'Your email address is listed using a different sign in method. Please use the same sign in method'
@@ -58,7 +68,8 @@ export default class Login extends Component {
 		}
 		emailLogin(email, password)
 			.then((data) => {
-				console.log(data);
+				this.props.loginUser(data);
+				this.props.navigator.navigate('Home');
 				this.setState({
 					highlighted
 				});
@@ -156,6 +167,12 @@ export default class Login extends Component {
 		);
 	}
 }
+
+const mapStateToProps = (state) => ({
+	login: state.login
+});
+
+export default connect(mapStateToProps, { loginUser })(Login);
 
 const styles = StyleSheet.create({
 	container: {
