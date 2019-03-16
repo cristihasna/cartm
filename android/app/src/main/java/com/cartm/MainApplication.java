@@ -3,6 +3,7 @@ package com.cartm;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -37,7 +38,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNGoogleSigninPackage(),
+          new RNGestureHandlerPackage(),
+          new RNGoogleSigninPackage(),
           new FBSDKPackage(mCallbackManager),
           new RNFirebasePackage(),
           new RNFirebaseAuthPackage(),

@@ -8,7 +8,7 @@ export default class CredentialInput extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			value: this.props.defaultValue || 'Default value'
+			value: this.props.defaultValue || ''
 		};
 	}
 
@@ -22,6 +22,12 @@ export default class CredentialInput extends Component {
 		return this.state.value;
 	}
 
+	set value(value) {
+		this.setState({
+			value
+		});
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
@@ -32,7 +38,10 @@ export default class CredentialInput extends Component {
 					style={styles.textInput}
 					onChangeText={this.handleOnChange.bind(this)}
 					value={this.state.value}
-					{...(this.props.secure ? { secureTextEntry: true } : { keyboardType: 'email-address' })}
+					placeholder={this.props.placeholder || this.props.type}
+					placeholderTextColor={colors.darkPurple}
+					{...(this.props.type === 'password' ? { secureTextEntry: true } : null)}
+					{...(this.props.type === 'email' ? { keyboardType: 'email-address' } : null)}
 				/>
 			</View>
 		);

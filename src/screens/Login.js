@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
-
+import { StyleSheet, Text, View, KeyboardAvoidingView, ScrollView, TouchableOpacity, ToastAndroid } from 'react-native';
 import { facebookLogin, googleLogin, emailLogin } from '../lib';
-
 import { Logo, HorizontalSeparator, SocialLoginButton, CredentialInput } from '../components';
-
 import colors from '../style/colors';
 
 export default class Login extends Component {
@@ -19,8 +16,12 @@ export default class Login extends Component {
 		};
 	}
 
-	initRegistrationScreen(email, password, showMessage) {
-		console.log(email, password, showMessage);
+	_initRegistrationScreen(email, password, showMessage) {
+		this.props.navigation.navigate('Register', { email, password, showMessage });
+	}
+
+	_showToast(message) {
+		ToastAndroid.showWithGravityAndOffset(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM, 0, 20);
 	}
 
 	handleSocialLogin(signinProvider) {
@@ -44,12 +45,18 @@ export default class Login extends Component {
 
 	handleEmailLogin() {
 		const email = this.emailField.value;
-		const pass = this.passField.value;
+		const password = this.passField.value;
 		let highlighted = {
 			email: false,
 			password: false
 		};
-		emailLogin(email, pass)
+		if (!email || !password) {
+			highlighted.email = highlighted.password = true;
+			this.setState({ highlighted });
+			this._showToast('Fields must not pe empty');
+			return;
+		}
+		emailLogin(email, password)
 			.then((data) => {
 				console.log(data);
 				this.setState({
@@ -58,14 +65,21 @@ export default class Login extends Component {
 			})
 			.catch((data) => {
 				console.log(data.code);
-				if (data.code === 'auth/invalid-email') highlighted.email = true;
-				else if (data.code === 'auth/invalid-password') highlighted.password = true;
-				else if (data.code === 'auth/user-not-found') {
-					this.setState({ highlighted });
-					this.initRegistrationScreen(email, pass, true);
+				if (data.code === 'auth/invalid-email') {
+					highlighted.email = true;
+					this._showToast('Email is invalid');
+				} else if (data.code === 'auth/invalid-password') {
+					highlighted.password = true;
+					this._showToast('Wrong password');
+				} else if (data.code === 'auth/user-not-found') {
+					highlighted.email = false;
+					highlighted.password = false;
+					this._showToast('Email is not registered');
+					this._initRegistrationScreen(email, password, true);
 				} else if (data.code === 'auth/user-disabled') {
 					highlighted.email = true;
 					highlighted.password = true;
+					this._showToast('Account disabled');
 				}
 				this.setState({ highlighted });
 			});
@@ -91,14 +105,14 @@ export default class Login extends Component {
 							</View>
 							<View>
 								<SocialLoginButton
-									title="log in with Facebook"
+									title="continue with Facebook"
 									iconName="facebook-f"
 									color={colors.facebookColor}
 									onClick={this.handleSocialLogin.bind(this, facebookLogin)}
 								/>
 								<SocialLoginButton
 									style={{ marginTop: 10 }}
-									title="log in with Google"
+									title="continue with Google"
 									iconName="google"
 									color={colors.googleColor}
 									onClick={this.handleSocialLogin.bind(this, googleLogin)}
@@ -115,14 +129,15 @@ export default class Login extends Component {
 							<CredentialInput
 								ref={(ref) => (this.emailField = ref)}
 								icon={'envelope'}
-								defaultValue={'your.email@site.com'}
+								placeHolder={'your.email@site.com'}
 								highlighted={this.state.highlighted.email}
+								type={'email'}
 							/>
 							<CredentialInput
 								ref={(ref) => (this.passField = ref)}
 								icon={'key'}
-								defaultValue={'password'}
-								secure={true}
+								placeholder={'password'}
+								type={'password'}
 								highlighted={this.state.highlighted.password}
 							/>
 							<View style={styles.submitButtons}>
@@ -130,7 +145,7 @@ export default class Login extends Component {
 									<Text style={styles.loginButtonText}>Login</Text>
 								</TouchableOpacity>
 								<Text style={styles.buttonsSeparator}>|</Text>
-								<TouchableOpacity activeOpacity={0.8} onPress={() => {}}>
+								<TouchableOpacity activeOpacity={0.8} onPress={() => this._initRegistrationScreen()}>
 									<Text style={styles.registerButtonText}>Register</Text>
 								</TouchableOpacity>
 							</View>
@@ -194,7 +209,7 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		color: colors.darkGrey
 	},
-	registerButtonText:{
+	registerButtonText: {
 		color: colors.black,
 		fontSize: 16,
 		height: 35,
