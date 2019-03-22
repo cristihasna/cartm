@@ -11,7 +11,10 @@ class Home extends Component {
 	render() {
 		return (
 			<View>
-				<Text>Hello</Text>
+				<Text
+					style={{
+						fontSize: 50,
+					}}>Hello</Text>
 				<Text>{this.props.login.displayName}</Text>
 				<Button
 					onPress={() =>{
