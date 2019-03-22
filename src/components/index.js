@@ -4,6 +4,8 @@ import HorizontalSeparator from './HorizontalSeparator';
 import CredentialInput from './CredentialInput';
 import SpinningIcon from './SpinningIcon';
 import DrawerContent from './DrawerContent';
+import MenuButton from './MenuButton';
+import RoundButton from './RoundButton';
 
 module.exports = {
     Logo,
@@ -11,5 +13,7 @@ module.exports = {
     HorizontalSeparator,
     CredentialInput,
     SpinningIcon,
-    DrawerContent
+    DrawerContent,
+    MenuButton,
+    RoundButton
 }

@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'rea
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
 import { connect } from 'react-redux';
+import { logoutUser } from '../redux/actions/loginActions';
+import firebase from 'react-native-firebase';
 
 const DrawerItem = ({ label, iconName, onPress, labelStyle, iconStyle, containerStyle }) => {
 	return (
@@ -14,6 +16,14 @@ const DrawerItem = ({ label, iconName, onPress, labelStyle, iconStyle, container
 };
 
 class DrawerContent extends Component {
+	_handleLogout() {
+		logoutUser();
+		firebase.auth().signOut().then(() => {
+			logoutUser();
+			this.props.navigation.navigate('RootNavigator');
+		});
+	}
+
 	render() {
 		const { navigation, login, session } = this.props;
 
@@ -52,17 +62,13 @@ class DrawerContent extends Component {
 					iconName={'user'}
 					onPress={() => console.warn('navigate to profile')}
 				/>
-                <DrawerItem
+				<DrawerItem
 					label={'Log out'}
 					iconName={'sign-out-alt'}
-					onPress={() => console.warn('sign out')}
-                    containerStyle={styles.separatorAfter}
+					onPress={this._handleLogout.bind(this)}
+					containerStyle={styles.separatorAfter}
 				/>
-                <DrawerItem
-					label={'Settings'}
-					iconName={'cog'}
-					onPress={() => console.warn('sign out')}
-				/>
+				<DrawerItem label={'Settings'} iconName={'cog'} onPress={() => console.warn('sign out')} />
 			</ScrollView>
 		);
 	}
