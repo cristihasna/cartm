@@ -47,6 +47,7 @@ export default class Register extends Component {
 			this.setState({ highlighted });
 			return;
 		}
+		
 		emailRegister(email, password)
 			.then((data) => {
 				console.log(data);

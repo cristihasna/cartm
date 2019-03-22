@@ -19,8 +19,9 @@ class Login extends Component {
 		};
 	}
 
-	componentWillReceiveProps(props){
-		console.log('new props', props);
+	_loginUser(data) {
+		this.props.loginUser(data);
+		this.props.navigation.navigate('AppNavigator');
 	}
 
 	_initRegistrationScreen(email, password, showMessage) {
@@ -32,28 +33,19 @@ class Login extends Component {
 	}
 
 	handleSocialLogin(signinProvider) {
-		signinProvider()
-			.then((data) => {
-				console.log(data);
-				this.props.loginUser(data);
-				this.props.navigation.navigate('Home');
-				this.setState({
-					highlighted: {
-						email: false,
-						password: false
-					}
-				});
-			})
-			.catch((data) => {
-				console.log(data);
-				if (data.code === 'auth/account-exists-with-different-credential')
-					alert(
-						'Your email address is listed using a different sign in method. Please use the same sign in method'
-					);
-			});
+		this.setState({ loading: true });
+		signinProvider().then((data) => this._loginUser(data)).catch((data) => {
+			console.log(data);
+			if (data.code === 'auth/account-exists-with-different-credential')
+				alert(
+					'Your email address is listed using a different sign in method. Please use the same sign in method'
+				);
+			this.setState({ loading: false });
+		});
 	}
 
 	handleEmailLogin() {
+		this.setState({ loading: true });
 		const email = this.emailField.value;
 		const password = this.passField.value;
 		let highlighted = {
@@ -64,36 +56,30 @@ class Login extends Component {
 			highlighted.email = highlighted.password = true;
 			this.setState({ highlighted });
 			this._showToast('Fields must not pe empty');
+			this.setState({ loading: false });
 			return;
 		}
-		emailLogin(email, password)
-			.then((data) => {
-				this.props.loginUser(data);
-				this.props.navigator.navigate('Home');
-				this.setState({
-					highlighted
-				});
-			})
-			.catch((data) => {
-				console.log(data.code);
-				if (data.code === 'auth/invalid-email') {
-					highlighted.email = true;
-					this._showToast('Email is invalid');
-				} else if (data.code === 'auth/invalid-password') {
-					highlighted.password = true;
-					this._showToast('Wrong password');
-				} else if (data.code === 'auth/user-not-found') {
-					highlighted.email = false;
-					highlighted.password = false;
-					this._showToast('Email is not registered');
-					this._initRegistrationScreen(email, password, true);
-				} else if (data.code === 'auth/user-disabled') {
-					highlighted.email = true;
-					highlighted.password = true;
-					this._showToast('Account disabled');
-				}
-				this.setState({ highlighted });
-			});
+		emailLogin(email, password).then((data) => this._loginUser(data)).catch((data) => {
+			this.setState({ loading: false });
+			if (data.code === 'auth/invalid-email') {
+				highlighted.email = true;
+				this._showToast('Email is invalid');
+			} else if (data.code === 'auth/invalid-password') {
+				highlighted.password = true;
+				this._showToast('Wrong password');
+			} else if (data.code === 'auth/user-not-found') {
+				highlighted.email = false;
+				highlighted.password = false;
+				this._showToast('Email is not registered');
+				this._initRegistrationScreen(email, password, true);
+				return;
+			} else if (data.code === 'auth/user-disabled') {
+				highlighted.email = true;
+				highlighted.password = true;
+				this._showToast('Account disabled');
+			}
+			this.setState({ highlighted });
+		});
 	}
 
 	render() {
@@ -120,6 +106,7 @@ class Login extends Component {
 									iconName="facebook-f"
 									color={colors.facebookColor}
 									onClick={this.handleSocialLogin.bind(this, facebookLogin)}
+									loading={this.state.loading}
 								/>
 								<SocialLoginButton
 									style={{ marginTop: 10 }}
@@ -127,6 +114,7 @@ class Login extends Component {
 									iconName="google"
 									color={colors.googleColor}
 									onClick={this.handleSocialLogin.bind(this, googleLogin)}
+									loading={this.state.loading}
 								/>
 							</View>
 						</View>

@@ -1,14 +1,16 @@
-import { createStackNavigator, createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import LoginNavigator from './LoginNavigator';
 import AppNavigator from './AppNavigator';
+import { Root } from '../screens';
 
-const RootNavigator = createStackNavigator(
+const RootNavigator = createSwitchNavigator(
 	{
+		RootNavigator: Root,
 		LoginNavigator,
 		AppNavigator
 	},
 	{
-		initialRouteName: 'LoginNavigator',
+		initialRouteName: 'RootNavigator',
 		defaultNavigationOptions: {
 			header: null
 		}

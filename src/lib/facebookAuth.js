@@ -1,5 +1,6 @@
 import { AccessToken, LoginManager } from 'react-native-fbsdk';
 import firebase from 'react-native-firebase';
+import normalize from './normalizeUserData';
 
 // Calling the following function will open the FB login dialogue:
 export default function facebookLogin() {
@@ -26,15 +27,15 @@ export default function facebookLogin() {
 									.auth()
 									.currentUser.getIdToken(/*forceRefresh*/ true)
 									.then((IDToken) => {
-										resolve({
-											status: 'ok',
-											credentials,
-											IDToken
+										const loginData = normalize({
+											IDToken,
+											email: credentials.user.email,
+											displayName: credentials.user.displayName,
+											profileImg: credentials.user.photoURL
 										});
+										resolve(loginData);
 									})
-									.catch((err) =>
-										reject(err)
-									)
+									.catch((err) => reject(err))
 							)
 							.catch((err) => reject(err));
 					})

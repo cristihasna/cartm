@@ -12,7 +12,7 @@ export default class SpinningIcon extends Component {
 
         this.animation = Animated.timing(this.state.spinAngle, {
 			toValue: 1,
-			duration: this.props.duration || 1000,
+			duration: this.props.cycleTime || 1000,
 			easing: Easing.linear,
             useNativeDriver: true,
             isInteraction: false
@@ -45,6 +45,6 @@ export default class SpinningIcon extends Component {
 }
 
 SpinningIcon.propTypes = {
-	duration: PropTypes.number,
+	cycleTime: PropTypes.number,
 	name: PropTypes.string.isRequired
 };
