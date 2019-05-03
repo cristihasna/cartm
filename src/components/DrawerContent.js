@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
 import { connect } from 'react-redux';
 import { logoutUser } from '../redux/actions/loginActions';
+import { createSession } from '../redux/actions/sessionActions';
 import firebase from 'react-native-firebase';
 
 const DrawerItem = ({ label, iconName, onPress, labelStyle, iconStyle, containerStyle }) => {
@@ -25,7 +26,7 @@ class DrawerContent extends Component {
 	}
 
 	render() {
-		const { navigation, login, session } = this.props;
+		const { navigation, login, session, createSession } = this.props;
 
 		return (
 			<ScrollView style={styles.container}>
@@ -43,14 +44,18 @@ class DrawerContent extends Component {
 					<DrawerItem
 						label={'Current session'}
 						iconName={'users'}
-						onPress={() => console.warn('navigate to current sess')}
+						onPress={() => navigation.navigate('CurrentSession')}
+						iconStyle={{ color: colors.purple }}
+						labelStyle={{ color: colors.purple }}
+						containerStyle={styles.separatorAfter}
 					/>
-				) : null}
-				<DrawerItem
-					label={'Create session'}
-					iconName={'shopping-cart'}
-					onPress={() => console.warn('navigate to new sess')}
-				/>
+				) : (
+					<DrawerItem
+						label={'Create session'}
+						iconName={'shopping-cart'}
+						onPress={() => createSession(navigation)}
+					/>
+				)}
 				<DrawerItem
 					label={'Split a receipt'}
 					iconName={'receipt'}
@@ -79,7 +84,7 @@ const mapStateToProps = (state) => ({
 	session: state.session
 });
 
-export default connect(mapStateToProps)(DrawerContent);
+export default connect(mapStateToProps,  {createSession})(DrawerContent);
 
 const styles = StyleSheet.create({
 	separatorAfter: {
@@ -105,6 +110,7 @@ const styles = StyleSheet.create({
 		height: 128,
 		borderRadius: 128,
 		borderColor: colors.lightPurple,
+		backgroundColor: colors.white,
 		borderWidth: 7,
 		overflow: 'hidden',
 		alignItems: 'center',

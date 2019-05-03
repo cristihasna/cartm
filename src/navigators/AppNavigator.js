@@ -1,11 +1,12 @@
 import { createDrawerNavigator } from 'react-navigation';
 
-import { Home } from '../screens';
+import { Home, CurrentSession } from '../screens';
 import { DrawerContent } from '../components';
 
 const AppNavigator = createDrawerNavigator(
 	{
-		Home
+		Home,
+		CurrentSession
 	},
 	{
 		defaultNavigationOptions:{

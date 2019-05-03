@@ -9,19 +9,12 @@ export default function emailRegister(email, password) {
 			.auth()
 			.createUserWithEmailAndPassword(email, password)
 			.then((credentials) => {
-				firebase
-					.auth()
-					.currentUser.getIdToken(/*forceRefresh*/ true)
-					.then((IDToken) => {
-						const loginData = normalize({
-							IDToken,
-							email: credentials.user.email,
-							displayName: credentials.user.displayName,
-							profileImg: credentials.user.photoURL
-						});
-						resolve(loginData);
-					})
-					.catch((err) => reject(err));
+				const loginData = normalize({
+					email: credentials.user.email,
+					displayName: credentials.user.displayName,
+					profileImg: credentials.user.photoURL
+				});
+				resolve(loginData);
 			})
 			.catch((err) => reject(err));
 	});

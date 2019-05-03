@@ -20,20 +20,12 @@ export default function googleLogin() {
 					.auth()
 					.signInWithCredential(credential)
 					.then((credentials) => {
-						//obtain ID token used to verify login status on server
-						firebase
-							.auth()
-							.currentUser.getIdToken(/*forceRefresh*/ true)
-							.then((IDToken) => {
-								const loginData = normalize({
-									IDToken,
-									email: credentials.user.email,
-									displayName: credentials.user.displayName,
-									profileImg: credentials.user.photoURL
-								});
-								resolve(loginData);
-							})
-							.catch((err) => reject(err));
+						const loginData = normalize({
+							email: credentials.user.email,
+							displayName: credentials.user.displayName,
+							profileImg: credentials.user.photoURL
+						});
+						resolve(loginData);
 					})
 					.catch((err) => reject(err));
 			})

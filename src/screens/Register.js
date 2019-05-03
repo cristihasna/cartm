@@ -5,6 +5,14 @@ import { emailRegister } from '../lib';
 import colors from '../style/colors';
 
 export default class Register extends Component {
+	static navigationOptions = {
+		title: 'Register',
+		headerStyle: {
+			backgroundColor: colors.white
+		},
+		headerTintColor: colors.purple
+	};
+
 	constructor(props) {
 		super(props);
 		const showMessage = this.props.navigation.getParam('showMessage', false);
@@ -47,11 +55,9 @@ export default class Register extends Component {
 			this.setState({ highlighted });
 			return;
 		}
-		
+
 		emailRegister(email, password)
-			.then((data) => {
-				console.log(data);
-			})
+			.then((data) => this.props.navigation.navigate('Home'))
 			.catch((err) => {
 				const showMessage = true;
 				let message = '';
@@ -99,14 +105,14 @@ export default class Register extends Component {
 								ref={(ref) => (this.emailField = ref)}
 								icon={'envelope'}
 								defaultValue={this.props.navigation.getParam('email', '')}
-                                type={'email'}
-                                highlighted={this.state.highlighted.email}
+								type={'email'}
+								highlighted={this.state.highlighted.email}
 							/>
 							<CredentialInput
 								ref={(ref) => (this.passField = ref)}
 								icon={'key'}
 								defaultValue={this.props.navigation.getParam('password', '')}
-                                type={'password'}
+								type={'password'}
 								highlighted={this.state.highlighted.password}
 							/>
 						</View>
@@ -121,7 +127,7 @@ export default class Register extends Component {
 								ref={(ref) => (this.confirmPassField = ref)}
 								icon={'key'}
 								placeholder={'confirm password'}
-                                type={'password'}
+								type={'password'}
 								highlighted={this.state.highlighted.confirmPassword}
 							/>
 						</View>
