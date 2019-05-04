@@ -1,18 +1,19 @@
-import { createStackNavigator } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation';
 
-import { Home } from '../screens';
+import { Home, CurrentSession } from '../screens';
+import { DrawerContent } from '../components';
 
-const AppNavigator = createStackNavigator(
+const AppNavigator = createDrawerNavigator(
 	{
-		Home: {
-			screen: Home,
-			navigationOptions: {
-				header: null
-			}
-		}
+		Home,
+		CurrentSession
 	},
 	{
-		initialRouteName: 'Home'
+		defaultNavigationOptions:{
+			header: null
+		},
+		initialRouteName: 'Home',
+		contentComponent: DrawerContent
 	}
 );
 

@@ -4,29 +4,29 @@ import firebase from 'react-native-firebase';
 import { SpinningIcon } from '../components';
 import colors from '../style/colors';
 import { loginUser } from '../redux/actions/loginActions';
+import { fetchSession } from '../redux/actions/sessionActions';
 import { connect } from 'react-redux';
 import normalize from '../lib/normalizeUserData';
 
 class Root extends Component {
 	componentDidMount() {
-		firebase.auth().onAuthStateChanged((user) => {
-			if (user) this._loginUser(user);
-			else this._navigateTo('LoginNavigator');
-		});
+		const user = firebase.auth().currentUser;
+		if (user) this._loginUser(user);
+		else this._navigateTo('LoginNavigator');
 	}
 
 	_navigateTo(route) {
 		setTimeout(() => this.props.navigation.navigate(route), 500);
-    }
-    
+	}
+
 	_loginUser(data) {
 		let loginData = normalize({
-			IDToken: data.IDToken || null,
 			email: data.email,
 			displayName: data.displayName,
 			profileImg: data.photoURL || null
 		});
 		this.props.loginUser(loginData);
+		this.props.fetchSession();
 		this._navigateTo('AppNavigator');
 	}
 
@@ -58,4 +58,4 @@ const mapStateToProps = (state) => ({
 	login: state.login
 });
 
-export default connect(mapStateToProps, { loginUser })(Root);
+export default connect(mapStateToProps, { loginUser, fetchSession })(Root);

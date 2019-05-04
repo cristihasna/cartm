@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, KeyboardAvoidingView, ScrollView, TouchableOpac
 import { facebookLogin, googleLogin, emailLogin } from '../lib';
 import { Logo, HorizontalSeparator, SocialLoginButton, CredentialInput } from '../components';
 import { loginUser } from '../redux/actions/loginActions';
+import { fetchSession } from '../redux/actions/sessionActions';
 import { connect } from 'react-redux';
 
 import colors from '../style/colors';
@@ -21,6 +22,7 @@ class Login extends Component {
 
 	_loginUser(data) {
 		this.props.loginUser(data);
+		this.props.fetchSession();
 		this.props.navigation.navigate('AppNavigator');
 	}
 
@@ -128,8 +130,9 @@ class Login extends Component {
 							<CredentialInput
 								ref={(ref) => (this.emailField = ref)}
 								icon={'envelope'}
-								placeHolder={'your.email@site.com'}
+								placeholder={'your.email@site.com'}
 								highlighted={this.state.highlighted.email}
+								defaultValue={this.props.navigation.getParam('email', '')}
 								type={'email'}
 							/>
 							<CredentialInput
@@ -156,11 +159,7 @@ class Login extends Component {
 	}
 }
 
-const mapStateToProps = (state) => ({
-	login: state.login
-});
-
-export default connect(mapStateToProps, { loginUser })(Login);
+export default connect(null, { loginUser, fetchSession })(Login);
 
 const styles = StyleSheet.create({
 	container: {
