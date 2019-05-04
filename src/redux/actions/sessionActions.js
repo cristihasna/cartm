@@ -29,6 +29,32 @@ export const createSession = (navigation) => async (dispatch) => {
 	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
+export const addProduct = (product) => async (dispatch) => {
+	// set loading true
+	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
+
+	// get user email and IDToken
+	const user = firebase.auth().currentUser;
+	const IDToken = await user.getIdToken();
+	const url = `${API_BASE_URL}/sessions/${user.email}/products?token=${IDToken}`;
+
+	// POST to /sessions/{user email}/products to add a new product to the session
+	console.log(`[POST] ${url}`);
+	fetch(url, { method: 'POST', body: JSON.stringify(product) })
+		.then((res) => res.json())
+		.then((data) => {
+			if (data.message) throw Error(data.message);
+			dispatch({ type: UPDATE_SESSION, sessionData: data });
+			if (navigation) navigation.navigate('CurrentSession');
+		})
+		.catch((err) => {
+			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+		});
+
+	// set loading false
+	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+};
+
 export const fetchSession = () => async (dispatch) => {
 	// set loading true
 	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
