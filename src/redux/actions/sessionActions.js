@@ -21,11 +21,11 @@ export const createSession = (navigation) => async (dispatch) => {
 		headers: {
 			Authorization: `Bearer ${IDToken}`
 		}
-	})
-		.then((res) => res.json())
-		.then((data) => {
-			if (data.message) throw Error(data.message);
-			dispatch({ type: UPDATE_SESSION, sessionData: data });
+	}) /*workaround to save the status code */
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+		.then((res) => {
+			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			else throw Error(res.body.data);
 			if (navigation) navigation.navigate('CurrentSession');
 		})
 		.catch((err) => {
@@ -51,14 +51,16 @@ export const addProduct = (product) => async (dispatch) => {
 		method: 'POST',
 		body: JSON.stringify(product),
 		headers: {
-			Authorization: `Bearer ${IDToken}`
+			Authorization: `Bearer ${IDToken}`,
+			'Content-Type': 'application/json',
+			'Accepts': 'application/json'
 		}
 	})
-		.then((res) => res.json())
-		.then((data) => {
-			if (data.message) throw Error(data.message);
-			dispatch({ type: UPDATE_SESSION, sessionData: data });
-			if (navigation) navigation.navigate('CurrentSession');
+		.then((res) => res.json().then((data) => ({status: res.status, body: data})))
+		.then((res) => {
+			if (res.status === 200)
+				dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			else throw Error(res.body.message);
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
@@ -84,10 +86,10 @@ export const fetchSession = () => async (dispatch) => {
 			Authorization: `Bearer ${IDToken}`
 		}
 	})
-		.then((res) => res.json())
-		.then((data) => {
-			if (data && data.message) throw Error(data.message);
-			dispatch({ type: UPDATE_SESSION, sessionData: data });
+		.then((res) => res.json().then(data => ({status: res.status, body: data})))
+		.then((res) => {
+			if (res.status !== 200) throw Error(res.body.message);
+			dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
@@ -114,9 +116,9 @@ export const leaveSession = (navigation) => async (dispatch) => {
 			Authorization: `Bearer ${IDToken}`
 		}
 	})
-		.then((res) => res.json())
-		.then((data) => {
-			if (data.message) throw Error(data.message);
+		.then((res) => res.json().then(data => ({status: res.status, body: data})))
+		.then((res) => {
+			if (res.status !== 200) throw Error(res.body.message);
 			dispatch({ type: LEAVE_SESSION });
 			if (navigation) navigation.navigate('Home');
 		})

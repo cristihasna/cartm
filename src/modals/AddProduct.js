@@ -8,7 +8,7 @@ import { HorizontalSeparator, RoundButton } from '../components';
 export default class AddProductModal extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { visible: false };
+		this.state = { visible: false, quantity: '1' };
 	}
 
 	isValidQuantity(quantity) {
@@ -50,7 +50,7 @@ export default class AddProductModal extends Component {
 	}
 
 	show() {
-		this.setState({ visible: true });
+		this.setState({ visible: true, price: undefined, name: undefined, quantity: '1' });
 	}
 
 	hide() {

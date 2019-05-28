@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ToastAndroid } from 'react-native';
 import { MenuButton, RoundButton, Product } from '../components';
 import { AddProduct } from '../modals';
-import { leaveSession } from '../redux/actions/sessionActions';
+import { leaveSession, addProduct } from '../redux/actions/sessionActions';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { normalizeUserData } from '../lib';
@@ -14,11 +14,19 @@ class CurrentSession extends Component {
 	}
 
 	_showAddProductModal() {
+		console.log('show modal');
 		this.addProductModal.current.show();
 	}
 
 	_handleAddProduct(product) {
 		console.log('new product:', product);
+		console.log(this.props.addProduct);
+		if (product.name && product.price && product.quantity) {
+			this.props.addProduct(product);
+			this.addProductModal.current.hide();
+		} else {
+			ToastAndroid.show("Product is not valid", ToastAndroid.LONG);
+		}
 	}
 
 	render() {
@@ -46,7 +54,7 @@ class CurrentSession extends Component {
 					renderItem={({ item }) => {
 						return (
 							<Product
-								name={item.name}
+								name={item.product.name}
 								unitPrice={item.unitPrice}
 								quantity={item.quantity}
 								participants={item.participants.map((participant) =>
@@ -68,7 +76,7 @@ class CurrentSession extends Component {
 						<RoundButton iconName="times" onPress={() => this.props.leaveSession(this.props.navigation)} />
 						<RoundButton
 							iconName="cart-plus"
-							onPress={() => this._showAddProductModal.bind(this)}
+							onPress={this._showAddProductModal.bind(this)}
 							large={true}
 						/>
 						<RoundButton iconName="credit-card" onPress={() => console.warn('summary')} />
@@ -82,10 +90,7 @@ class CurrentSession extends Component {
 					<MenuButton onPress={() => this.props.navigation.toggleDrawer()} />
 				</View>
 				{this.props.session && this.props.session.products.length === 0 ? emptyCart : productsCart}
-				<AddProduct
-					ref={this.addProductModal}
-					onAddProduct={this._handleAddProduct.bind(this)}
-				/>
+				<AddProduct ref={this.addProductModal} onAddProduct={this._handleAddProduct.bind(this)} />
 			</View>
 		);
 	}
@@ -96,7 +101,7 @@ const mapStateToProps = (state) => ({
 	session: state.session
 });
 
-export default connect(mapStateToProps, { leaveSession })(CurrentSession);
+export default connect(mapStateToProps, { leaveSession, addProduct })(CurrentSession);
 
 const styles = StyleSheet.create({
 	container: {
