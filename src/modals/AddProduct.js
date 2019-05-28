@@ -143,10 +143,6 @@ export default class AddProductModal extends Component {
 }
 
 AddProductModal.propTypes = {
-    session: PropTypes.shape({
-		products: PropTypes.array.isRequired,
-		participants: PropTypes.array.isRequired
-	}).isRequired,
 	onAddProduct: PropTypes.func.isRequired
 };
 

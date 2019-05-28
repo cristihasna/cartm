@@ -63,10 +63,12 @@ class Login extends Component {
 		}
 		emailLogin(email, password).then((data) => this._loginUser(data)).catch((data) => {
 			this.setState({ loading: false });
+			console.log("intra in catch")
+			console.log(data.code);
 			if (data.code === 'auth/invalid-email') {
 				highlighted.email = true;
 				this._showToast('Email is invalid');
-			} else if (data.code === 'auth/invalid-password') {
+			} else if (data.code === 'auth/wrong-password') {
 				highlighted.password = true;
 				this._showToast('Wrong password');
 			} else if (data.code === 'auth/user-not-found') {

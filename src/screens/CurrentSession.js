@@ -84,7 +84,6 @@ class CurrentSession extends Component {
 				{this.props.session && this.props.session.products.length === 0 ? emptyCart : productsCart}
 				<AddProduct
 					ref={this.addProductModal}
-					session={this.props.session}
 					onAddProduct={this._handleAddProduct.bind(this)}
 				/>
 			</View>

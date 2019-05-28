@@ -3,6 +3,8 @@ import { API_BASE_URL } from 'react-native-dotenv';
 import { ToastAndroid } from 'react-native';
 import firebase from 'react-native-firebase';
 
+console.log(`${API_BASE_URL} is the actual api base url`);
+
 export const createSession = (navigation) => async (dispatch) => {
 	// set loading true
 	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
@@ -10,11 +12,16 @@ export const createSession = (navigation) => async (dispatch) => {
 	// get user email and IDToken
 	const user = firebase.auth().currentUser;
 	const IDToken = await user.getIdToken();
-	const url = `${API_BASE_URL}/sessions/${user.email}/create?token=${IDToken}`;
+	const url = `${API_BASE_URL}/sessions/${user.email}/create`;
 
 	// POST to /sessions/{user email} to create a new session
 	console.log(`[POST] ${url}`);
-	fetch(url, { method: 'POST' })
+	fetch(url, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${IDToken}`
+		}
+	})
 		.then((res) => res.json())
 		.then((data) => {
 			if (data.message) throw Error(data.message);
@@ -36,11 +43,17 @@ export const addProduct = (product) => async (dispatch) => {
 	// get user email and IDToken
 	const user = firebase.auth().currentUser;
 	const IDToken = await user.getIdToken();
-	const url = `${API_BASE_URL}/sessions/${user.email}/products?token=${IDToken}`;
+	const url = `${API_BASE_URL}/sessions/${user.email}/products`;
 
 	// POST to /sessions/{user email}/products to add a new product to the session
 	console.log(`[POST] ${url}`);
-	fetch(url, { method: 'POST', body: JSON.stringify(product) })
+	fetch(url, {
+		method: 'POST',
+		body: JSON.stringify(product),
+		headers: {
+			Authorization: `Bearer ${IDToken}`
+		}
+	})
 		.then((res) => res.json())
 		.then((data) => {
 			if (data.message) throw Error(data.message);
@@ -62,11 +75,15 @@ export const fetchSession = () => async (dispatch) => {
 	// get user email and IDToken
 	const user = firebase.auth().currentUser;
 	const IDToken = await user.getIdToken();
-	const url = `${API_BASE_URL}/sessions/${user.email}?token=${IDToken}`;
+	const url = `${API_BASE_URL}/sessions/${user.email}`;
 
 	// GET to /sessions/{user email} to fetch the current session
 	console.log(`[GET] ${url}`);
-	fetch(url)
+	fetch(url, {
+		headers: {
+			Authorization: `Bearer ${IDToken}`
+		}
+	})
 		.then((res) => res.json())
 		.then((data) => {
 			if (data && data.message) throw Error(data.message);
@@ -87,11 +104,16 @@ export const leaveSession = (navigation) => async (dispatch) => {
 	// get user email and IDToken
 	const user = firebase.auth().currentUser;
 	const IDToken = await user.getIdToken();
-	const url = `${API_BASE_URL}/sessions/${user.email}/participants/${user.email}?token=${IDToken}`;
+	const url = `${API_BASE_URL}/sessions/${user.email}/participants/${user.email}`;
 
 	// DELETE to /sessions/{user email} to leave the current session
 	console.log(`[DELETE] ${url}`);
-	fetch(url, { method: 'DELETE' })
+	fetch(url, {
+		method: 'DELETE',
+		headers: {
+			Authorization: `Bearer ${IDToken}`
+		}
+	})
 		.then((res) => res.json())
 		.then((data) => {
 			if (data.message) throw Error(data.message);
