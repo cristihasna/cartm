@@ -24,8 +24,8 @@ export const createSession = (navigation) => async (dispatch) => {
 	}) /*workaround to save the status code */
 		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
 		.then((res) => {
-			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
-			else throw Error(res.body.data);
+			if (res.status === 201) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			else if (res.status !== 400) throw Error(res.body.message);
 			if (navigation) navigation.navigate('CurrentSession');
 		})
 		.catch((err) => {
