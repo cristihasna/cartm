@@ -1,11 +1,20 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ToastAndroid, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { MenuButton, RoundButton, Product } from '../components';
 import { AddProduct } from '../modals';
 import { leaveSession, addProduct } from '../redux/actions/sessionActions';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { normalizeUserData } from '../lib';
+
+const UserListButton = ({ onPress }) => {
+	return (
+		<TouchableOpacity style={styles.userListButtonContainer} onPress={onPress}>
+			<Icon name="users-cog" style={styles.userListButtonIcon} />
+		</TouchableOpacity>
+	);
+};
 
 class CurrentSession extends Component {
 	constructor(props) {
@@ -25,7 +34,7 @@ class CurrentSession extends Component {
 			this.props.addProduct(product);
 			this.addProductModal.current.hide();
 		} else {
-			ToastAndroid.show("Product is not valid", ToastAndroid.LONG);
+			ToastAndroid.show('Product is not valid', ToastAndroid.LONG);
 		}
 	}
 
@@ -74,11 +83,7 @@ class CurrentSession extends Component {
 				<View style={styles.productsButtonsGroup}>
 					<View style={styles.productsButtonsWrapper}>
 						<RoundButton iconName="times" onPress={() => this.props.leaveSession(this.props.navigation)} />
-						<RoundButton
-							iconName="cart-plus"
-							onPress={this._showAddProductModal.bind(this)}
-							large={true}
-						/>
+						<RoundButton iconName="cart-plus" onPress={this._showAddProductModal.bind(this)} large={true} />
 						<RoundButton iconName="credit-card" onPress={() => console.warn('summary')} />
 					</View>
 				</View>
@@ -87,7 +92,8 @@ class CurrentSession extends Component {
 		return (
 			<View style={styles.container}>
 				<View style={styles.headerContainer}>
-					<MenuButton onPress={() => this.props.navigation.toggleDrawer()} />
+					<MenuButton onPress={() => this.props.navigation.toggleDrawer()} logo />
+					<UserListButton onPress={() => console.log('pressed')} />
 				</View>
 				{this.props.session && this.props.session.products.length === 0 ? emptyCart : productsCart}
 				<AddProduct ref={this.addProductModal} onAddProduct={this._handleAddProduct.bind(this)} />
@@ -112,7 +118,10 @@ const styles = StyleSheet.create({
 	},
 	headerContainer: {
 		paddingHorizontal: 10,
-		paddingVertical: 10
+		paddingVertical: 10,
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between'
 	},
 	description: {
 		paddingHorizontal: 40,
@@ -149,5 +158,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-evenly',
 		alignItems: 'center'
+	},
+	userListButtonIcon: {
+		fontSize: 36,
+		color: colors.purple
 	}
 });
