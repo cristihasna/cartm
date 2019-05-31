@@ -8,6 +8,7 @@ import MenuButton from './MenuButton';
 import RoundButton from './RoundButton';
 import ParticipantsList from './ParticipantsList';
 import Product from './Product';
+import UserList from './UserList';
 
 module.exports = {
     Logo,
@@ -19,5 +20,6 @@ module.exports = {
     MenuButton,
     RoundButton,
     Product,
-    ParticipantsList
+    ParticipantsList,
+    UserList
 }

@@ -53,13 +53,12 @@ export const addProduct = (product) => async (dispatch) => {
 		headers: {
 			Authorization: `Bearer ${IDToken}`,
 			'Content-Type': 'application/json',
-			'Accepts': 'application/json'
+			Accepts: 'application/json'
 		}
 	})
-		.then((res) => res.json().then((data) => ({status: res.status, body: data})))
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
 		.then((res) => {
-			if (res.status === 200)
-				dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
 		})
 		.catch((err) => {
@@ -70,7 +69,72 @@ export const addProduct = (product) => async (dispatch) => {
 	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
-export const fetchSession = () => async (dispatch) => {
+export const addParticipantToSession = (email) => async (dispatch) => {
+	// set loading true
+	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
+
+	// get user email and IDToken
+	const user = firebase.auth().currentUser;
+	const IDToken = await user.getIdToken();
+	const url = `${API_BASE_URL}/sessions/${user.email}/participants/`;
+
+	// POST to /sessions/{user email}/products to add a new product to the session
+	console.log(`[POST] ${url}`);
+	fetch(url, {
+		method: 'POST',
+		body: JSON.stringify({ email }),
+		headers: {
+			Authorization: `Bearer ${IDToken}`,
+			'Content-Type': 'application/json',
+			Accepts: 'application/json'
+		}
+	})
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+		.then((res) => {
+			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			else throw Error(res.body.message);
+		})
+		.catch((err) => {
+			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+		});
+
+	// set loading false
+	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+};
+
+export const removeParticipantFromSession = (email) => async (dispatch) => {
+	// set loading true
+	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
+
+	// get user email and IDToken
+	const user = firebase.auth().currentUser;
+	const IDToken = await user.getIdToken();
+	const url = `${API_BASE_URL}/sessions/${user.email}/participants/${email}`;
+
+	// POST to /sessions/{user email}/products to add a new product to the session
+	console.log(`[DELETE] ${url}`);
+	fetch(url, {
+		method: 'DELETE',
+		headers: {
+			Authorization: `Bearer ${IDToken}`,
+			'Content-Type': 'application/json',
+			Accepts: 'application/json'
+		}
+	})
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+		.then((res) => {
+			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			else throw Error(res.body.message);
+		})
+		.catch((err) => {
+			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+		});
+
+	// set loading false
+	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+};
+
+export const fetchSession = (navigation) => async (dispatch) => {
 	// set loading true
 	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
 
@@ -86,10 +150,12 @@ export const fetchSession = () => async (dispatch) => {
 			Authorization: `Bearer ${IDToken}`
 		}
 	})
-		.then((res) => res.json().then(data => ({status: res.status, body: data})))
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
 		.then((res) => {
-			if (res.status !== 200) throw Error(res.body.message);
-			dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			if (res.status === 200) {
+				dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+				if (navigation) navigation.navigate('CurrentSession');
+			} else if (res.status !== 404) throw Error(res.body.message);
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
@@ -116,7 +182,7 @@ export const leaveSession = (navigation) => async (dispatch) => {
 			Authorization: `Bearer ${IDToken}`
 		}
 	})
-		.then((res) => res.json().then(data => ({status: res.status, body: data})))
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
 		.then((res) => {
 			if (res.status !== 200) throw Error(res.body.message);
 			dispatch({ type: LEAVE_SESSION });

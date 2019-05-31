@@ -2,8 +2,13 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, ToastAndroid, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { MenuButton, RoundButton, Product } from '../components';
-import { AddProduct } from '../modals';
-import { leaveSession, addProduct } from '../redux/actions/sessionActions';
+import { AddProduct, SessionParticipantsManager } from '../modals';
+import {
+	leaveSession,
+	addProduct,
+	addParticipantToSession,
+	removeParticipantFromSession
+} from '../redux/actions/sessionActions';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { normalizeUserData } from '../lib';
@@ -20,11 +25,15 @@ class CurrentSession extends Component {
 	constructor(props) {
 		super(props);
 		this.addProductModal = React.createRef();
+		this.sessionParticipantsModal = React.createRef();
 	}
 
 	_showAddProductModal() {
-		console.log('show modal');
 		this.addProductModal.current.show();
+	}
+
+	_showSessionParticipantsModal() {
+		this.sessionParticipantsModal.current.show();
 	}
 
 	_handleAddProduct(product) {
@@ -38,7 +47,16 @@ class CurrentSession extends Component {
 		}
 	}
 
+	_handleAddParticipantToSession(participant) {
+		this.props.addParticipantToSession(participant.email);
+	}
+
+	_handleRemoveParticipantFromSession(participant) {
+		this.props.removeParticipantFromSession(participant.email);
+	}
+
 	render() {
+		if (!this.props.session || !this.props.login) return null;
 		const emptyCart = (
 			<View style={styles.emptyCartContainer}>
 				<Text style={styles.description}>
@@ -54,7 +72,7 @@ class CurrentSession extends Component {
 				</View>
 			</View>
 		);
-		const productsCart = this.props.session ? (
+		const productsCart = (
 			<View style={styles.cartContainer}>
 				<FlatList
 					style={styles.productsContainer}
@@ -88,15 +106,26 @@ class CurrentSession extends Component {
 					</View>
 				</View>
 			</View>
-		) : null;
+		);
 		return (
 			<View style={styles.container}>
 				<View style={styles.headerContainer}>
 					<MenuButton onPress={() => this.props.navigation.toggleDrawer()} logo />
-					<UserListButton onPress={() => console.log('pressed')} />
+					<UserListButton onPress={this._showSessionParticipantsModal.bind(this)} />
 				</View>
-				{this.props.session && this.props.session.products.length === 0 ? emptyCart : productsCart}
+				{this.props.session.products.length === 0 ? emptyCart : productsCart}
 				<AddProduct ref={this.addProductModal} onAddProduct={this._handleAddProduct.bind(this)} />
+				<SessionParticipantsManager
+					ref={this.sessionParticipantsModal}
+					onAdd={this._handleAddParticipantToSession.bind(this)}
+					onRemove={this._handleRemoveParticipantFromSession.bind(this)}
+					participants={this.props.session.participants.map(
+						(participant) =>
+							participant.email === this.props.login.email
+								? Object.assign(participant, { isHost: true })
+								: participant
+					)}
+				/>
 			</View>
 		);
 	}
@@ -107,7 +136,12 @@ const mapStateToProps = (state) => ({
 	session: state.session
 });
 
-export default connect(mapStateToProps, { leaveSession, addProduct })(CurrentSession);
+export default connect(mapStateToProps, {
+	leaveSession,
+	addProduct,
+	addParticipantToSession,
+	removeParticipantFromSession
+})(CurrentSession);
 
 const styles = StyleSheet.create({
 	container: {

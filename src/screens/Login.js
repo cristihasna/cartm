@@ -22,7 +22,7 @@ class Login extends Component {
 
 	_loginUser(data) {
 		this.props.loginUser(data);
-		this.props.fetchSession();
+		this.props.fetchSession(this.props.navigation);
 		this.props.navigation.navigate('AppNavigator');
 	}
 
