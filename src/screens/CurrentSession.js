@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, ToastAndroid, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ToastAndroid, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { MenuButton, RoundButton, Product } from '../components';
+import { MenuButton, RoundButton, CartProductsList } from '../components';
 import { AddProduct, SessionParticipantsManager, ProductParticipantsManager } from '../modals';
 import {
 	leaveSession,
@@ -13,7 +13,6 @@ import {
 } from '../redux/actions/sessionActions';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
-import { normalizeUserData } from '../lib';
 
 const UserListButton = ({ onPress }) => {
 	return (
@@ -45,7 +44,6 @@ class CurrentSession extends Component {
 	}
 
 	_showOnModalParticipantsModal(product) {
-		console.log('show new product participants modal for ', product);
 		this.newProductParticipantsModal.current.show(Object.assign(product));
 	}
 
@@ -93,29 +91,10 @@ class CurrentSession extends Component {
 		);
 		const productsCart = (
 			<View style={styles.cartContainer}>
-				<FlatList
-					style={styles.productsContainer}
-					data={this.props.session.products}
-					keyExtractor={(product) => product._id}
-					renderItem={({ item }) => {
-						return (
-							<Product
-								name={item.product.name}
-								unitPrice={item.unitPrice}
-								quantity={item.quantity}
-								participants={item.participants.map((participant) =>
-									normalizeUserData(
-										this.props.session.participants.find((other) => other.email === participant)
-											.profile
-									)
-								)}
-								onPriceChange={(price) => console.log(`new price: ${price}`)}
-								onQuantityChange={(quantity) => console.log(`new quantity: ${quantity}`)}
-								onTitleTrigger={() => console.log('title trigged')}
-								onParticipantsTrigger={() => this._showProductParticipantsModal(item)}
-							/>
-						);
-					}}
+				<CartProductsList
+					products={this.props.session.products}
+					participants={this.props.session.participants}
+					onParticipantsTrigger={this._showProductParticipantsModal.bind(this)}
 				/>
 				<View style={styles.productsButtonsGroup}>
 					<View style={styles.productsButtonsWrapper}>
@@ -216,10 +195,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingTop: 20,
 		paddingHorizontal: 15
-	},
-	productsContainer: {
-		flex: 1,
-		alignSelf: 'stretch'
 	},
 	productsButtonsGroup: {
 		height: 128

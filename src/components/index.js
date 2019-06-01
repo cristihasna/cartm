@@ -7,6 +7,7 @@ import DrawerContent from './DrawerContent';
 import MenuButton from './MenuButton';
 import RoundButton from './RoundButton';
 import ParticipantsList from './ParticipantsList';
+import CartProductsList from './CartProductsList';
 import Product from './Product';
 import UserList from './UserList';
 
@@ -19,6 +20,7 @@ module.exports = {
     DrawerContent,
     MenuButton,
     RoundButton,
+    CartProductsList,
     Product,
     ParticipantsList,
     UserList
