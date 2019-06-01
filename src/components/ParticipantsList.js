@@ -19,13 +19,13 @@ const Participant = (p, style) => {
 export default class ParticipantsList extends Component {
 	render() {
 		return (
-			<TouchableOpacity style={styles.container}>
+			<View style={styles.container}>
 				{this.props.participants.length > 0 ? (
 					this.props.participants.map((p, i) => <Participant key={i} participant={p} />)
 				) : (
 					<Participant participant={{ profileImgReplacement: '?' }} />
 				)}
-			</TouchableOpacity>
+			</View>
 		);
 	}
 }

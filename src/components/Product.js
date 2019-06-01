@@ -29,7 +29,7 @@ export default class Product extends Component {
 						onChange={this.props.onQuantityChange}
 					/>
 				</View>
-				<TouchableOpacity style={styles.participantsContainer}>
+				<TouchableOpacity onPress={this.props.onParticipantsTrigger} style={styles.participantsContainer}>
 					<ParticipantsList participants={this.props.participants} />
 				</TouchableOpacity>
 			</View>

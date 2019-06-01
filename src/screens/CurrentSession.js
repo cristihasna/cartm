@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, ToastAndroid, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { MenuButton, RoundButton, Product } from '../components';
-import { AddProduct, SessionParticipantsManager } from '../modals';
+import { AddProduct, SessionParticipantsManager, ProductParticipantsManager } from '../modals';
 import {
 	leaveSession,
 	addProduct,
 	addParticipantToSession,
-	removeParticipantFromSession
+	removeParticipantFromSession,
+	addParticipantToProduct,
+	removeParticipantFromProduct
 } from '../redux/actions/sessionActions';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
@@ -26,6 +28,7 @@ class CurrentSession extends Component {
 		super(props);
 		this.addProductModal = React.createRef();
 		this.sessionParticipantsModal = React.createRef();
+		this.productParticipantsModal = React.createRef();
 	}
 
 	_showAddProductModal() {
@@ -34,6 +37,10 @@ class CurrentSession extends Component {
 
 	_showSessionParticipantsModal() {
 		this.sessionParticipantsModal.current.show();
+	}
+
+	_showProductParticipantsModal(product) {
+		this.productParticipantsModal.current.show(product);
 	}
 
 	_handleAddProduct(product) {
@@ -53,6 +60,14 @@ class CurrentSession extends Component {
 
 	_handleRemoveParticipantFromSession(participant) {
 		this.props.removeParticipantFromSession(participant.email);
+	}
+
+	_handleAddParticipantToProduct(product, participant) {
+		this.props.addParticipantToProduct(product, participant.email);
+	}
+
+	_handleRemoveParticipantFromProduct(product, participant) {
+		this.props.removeParticipantFromProduct(product, participant.email);
 	}
 
 	render() {
@@ -93,7 +108,7 @@ class CurrentSession extends Component {
 								onPriceChange={(price) => console.log(`new price: ${price}`)}
 								onQuantityChange={(quantity) => console.log(`new quantity: ${quantity}`)}
 								onTitleTrigger={() => console.log('title trigged')}
-								onParticipantsTrigger={() => console.log('participants triggered')}
+								onParticipantsTrigger={() => this._showProductParticipantsModal(item)}
 							/>
 						);
 					}}
@@ -126,6 +141,12 @@ class CurrentSession extends Component {
 								: participant
 					)}
 				/>
+				<ProductParticipantsManager
+					ref={this.productParticipantsModal}
+					onAdd={this._handleAddParticipantToProduct.bind(this)}
+					onRemove={this._handleRemoveParticipantFromProduct.bind(this)}
+					participants={this.props.session.participants}
+				/>
 			</View>
 		);
 	}
@@ -140,7 +161,9 @@ export default connect(mapStateToProps, {
 	leaveSession,
 	addProduct,
 	addParticipantToSession,
-	removeParticipantFromSession
+	removeParticipantFromSession,
+	addParticipantToProduct,
+	removeParticipantFromProduct
 })(CurrentSession);
 
 const styles = StyleSheet.create({
