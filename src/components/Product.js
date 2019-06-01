@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        marginLeft: 20 + '%',
+        marginLeft: 10 + '%',
         width: 100
 	},
 	priceInput: {

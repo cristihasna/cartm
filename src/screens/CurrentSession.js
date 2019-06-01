@@ -29,6 +29,7 @@ class CurrentSession extends Component {
 		this.addProductModal = React.createRef();
 		this.sessionParticipantsModal = React.createRef();
 		this.productParticipantsModal = React.createRef();
+		this.newProductParticipantsModal = React.createRef();
 	}
 
 	_showAddProductModal() {
@@ -43,9 +44,12 @@ class CurrentSession extends Component {
 		this.productParticipantsModal.current.show(product);
 	}
 
+	_showOnModalParticipantsModal(product) {
+		console.log('show new product participants modal for ', product);
+		this.newProductParticipantsModal.current.show(Object.assign(product));
+	}
+
 	_handleAddProduct(product) {
-		console.log('new product:', product);
-		console.log(this.props.addProduct);
 		if (product.name && product.price && product.quantity) {
 			this.props.addProduct(product);
 			this.addProductModal.current.hide();
@@ -129,7 +133,11 @@ class CurrentSession extends Component {
 					<UserListButton onPress={this._showSessionParticipantsModal.bind(this)} />
 				</View>
 				{this.props.session.products.length === 0 ? emptyCart : productsCart}
-				<AddProduct ref={this.addProductModal} onAddProduct={this._handleAddProduct.bind(this)} />
+				<AddProduct
+					ref={this.addProductModal}
+					onAddProduct={this._handleAddProduct.bind(this)}
+					onParticipantsTrigger={this._showOnModalParticipantsModal.bind(this)}
+				/>
 				<SessionParticipantsManager
 					ref={this.sessionParticipantsModal}
 					onAdd={this._handleAddParticipantToSession.bind(this)}
@@ -145,6 +153,14 @@ class CurrentSession extends Component {
 					ref={this.productParticipantsModal}
 					onAdd={this._handleAddParticipantToProduct.bind(this)}
 					onRemove={this._handleRemoveParticipantFromProduct.bind(this)}
+					participants={this.props.session.participants}
+				/>
+				<ProductParticipantsManager
+					ref={this.newProductParticipantsModal}
+					onAdd={(_, participant) => {
+						this.addProductModal.current.addParticipant(participant);
+					}}
+					onRemove={(_, participant) => this.addProductModal.current.removeParticipant(participant)}
 					participants={this.props.session.participants}
 				/>
 			</View>

@@ -3,12 +3,13 @@ import { Text, View, Modal, TouchableOpacity, TextInput, StyleSheet, ToastAndroi
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
-import { HorizontalSeparator, RoundButton } from '../components';
+import { normalizeUserData } from '../lib';
+import { HorizontalSeparator, RoundButton, ParticipantsList } from '../components';
 
 export default class AddProductModal extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { visible: false, quantity: '1' };
+		this.state = { visible: false, quantity: '1', users: [] };
 	}
 
 	isValidQuantity(quantity) {
@@ -49,6 +50,16 @@ export default class AddProductModal extends Component {
 		}
 	}
 
+	addParticipant(participant) {
+		const newParticipantsList = this.state.users.concat(participant);
+		this.setState({ users: newParticipantsList });
+	}
+
+	removeParticipant(participant) {
+		const newParticipantsList = this.state.users.filter((other) => other.email !== participant.email);
+		this.setState({ users: newParticipantsList });
+	}
+
 	show() {
 		this.setState({ visible: true, price: undefined, name: undefined, quantity: '1' });
 	}
@@ -62,7 +73,8 @@ export default class AddProductModal extends Component {
 			barcode: this.state.barcode,
 			name: this.state.name,
 			price: parseFloat(this.state.price),
-			quantity: parseInt(this.state.quantity)
+			quantity: parseInt(this.state.quantity),
+			participants: this.state.users.map((participant) => participant.email)
 		};
 		this.props.onAddProduct(product);
 	}
@@ -127,14 +139,26 @@ export default class AddProductModal extends Component {
 						</View>
 					</View>
 					<View style={styles.buttonsContainer}>
-						<View style={styles.buttonPlaceholder} />
+						<View style={styles.buttonPlaceholder}>
+							<ParticipantsList
+								participants={this.state.users.map((participant) =>
+									normalizeUserData(participant.profile)
+								)}
+							/>
+						</View>
 						<RoundButton
 							iconName="cart-plus"
 							onPress={this._handleAddProduct.bind(this)}
 							containerStyle={{ backgroundColor: colors.darkPurple }}
 							large
 						/>
-						<RoundButton iconName="user-plus" onPress={this._handleAddProduct.bind(this)} />
+						<RoundButton
+							iconName="user-plus"
+							onPress={() =>
+								this.props.onParticipantsTrigger({
+									participants: this.state.users.map((p) => p.email)
+								})}
+						/>
 					</View>
 				</View>
 			</Modal>
@@ -143,7 +167,8 @@ export default class AddProductModal extends Component {
 }
 
 AddProductModal.propTypes = {
-	onAddProduct: PropTypes.func.isRequired
+	onAddProduct: PropTypes.func.isRequired,
+	onParticipantsTrigger: PropTypes.func.isRequired
 };
 
 const styles = StyleSheet.create({
@@ -218,6 +243,8 @@ const styles = StyleSheet.create({
 	},
 	buttonPlaceholder: {
 		width: 56,
-		height: 56
+		height: 56,
+		paddingRight:0,
+		justifyContent: 'center'
 	}
 });
