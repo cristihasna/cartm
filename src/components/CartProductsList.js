@@ -14,14 +14,9 @@ export default class CartProductsList extends Component {
 				renderItem={({ item }) => {
 					return (
 						<Product
-							name={item.product.name}
-							unitPrice={item.unitPrice}
-							quantity={item.quantity}
-							participants={item.participants.map((participant) =>
-								normalizeUserData(
-									this.props.participants.find((other) => other.email === participant).profile
-								)
-							)}
+							product={item}
+                            onRemove={this.props.onRemoveProduct}
+							participants={this.props.participants}
 							onPriceChange={(price) => console.log(`new price: ${price}`)}
 							onQuantityChange={(quantity) => console.log(`new quantity: ${quantity}`)}
 							onTitleTrigger={() => console.log('title trigged')}
@@ -37,7 +32,8 @@ export default class CartProductsList extends Component {
 CartProductsList.propTypes = {
 	products: PropTypes.array.isRequired,
 	participants: PropTypes.array.isRequired,
-	onParticipantsTrigger: PropTypes.func.isRequired
+    onParticipantsTrigger: PropTypes.func.isRequired,
+    onRemoveProduct: PropTypes.func.isRequired
 };
 
 const styles = StyleSheet.create({

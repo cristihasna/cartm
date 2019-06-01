@@ -3,14 +3,13 @@ import { View, Text, StyleSheet, ToastAndroid, TouchableOpacity } from 'react-na
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { MenuButton, RoundButton, CartProductsList } from '../components';
 import { AddProduct, SessionParticipantsManager, ProductParticipantsManager } from '../modals';
+import { leaveSession, addParticipantToSession, removeParticipantFromSession } from '../redux/actions/sessionActions';
 import {
-	leaveSession,
 	addProduct,
-	addParticipantToSession,
-	removeParticipantFromSession,
+	removeProduct,
 	addParticipantToProduct,
 	removeParticipantFromProduct
-} from '../redux/actions/sessionActions';
+} from '../redux/actions/productActions';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 
@@ -56,6 +55,10 @@ class CurrentSession extends Component {
 		}
 	}
 
+	_handleRemoveProduct(product) {
+		this.props.removeProduct(product);
+	}
+
 	_handleAddParticipantToSession(participant) {
 		this.props.addParticipantToSession(participant.email);
 	}
@@ -94,6 +97,7 @@ class CurrentSession extends Component {
 				<CartProductsList
 					products={this.props.session.products}
 					participants={this.props.session.participants}
+					onRemoveProduct={this._handleRemoveProduct.bind(this)}
 					onParticipantsTrigger={this._showProductParticipantsModal.bind(this)}
 				/>
 				<View style={styles.productsButtonsGroup}>
@@ -155,6 +159,7 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
 	leaveSession,
 	addProduct,
+	removeProduct,
 	addParticipantToSession,
 	removeParticipantFromSession,
 	addParticipantToProduct,
