@@ -18,14 +18,19 @@ const Participant = (p, style) => {
 
 export default class ParticipantsList extends Component {
 	render() {
+		let participants;
+		if (this.props.participants.length === 0) participants = <Participant participant={{ profileImgReplacement: '?' }} />;
+		else if (this.props.participants.length <= 4)
+			participants = this.props.participants.map((p, i) => <Participant key={i} participant={p} />);
+		else
+			participants = this.props.participants
+				.slice(0, 3)
+				.concat({ profileImgReplacement: '...' })
+				.map((p, i) => <Participant key={i} participant={p} />);
 		return (
-			<TouchableOpacity style={styles.container}>
-				{this.props.participants.length > 0 ? (
-					this.props.participants.map((p, i) => <Participant key={i} participant={p} />)
-				) : (
-					<Participant participant={{ profileImgReplacement: '?' }} />
-				)}
-			</TouchableOpacity>
+			<View style={styles.container}>
+				{participants}
+			</View>
 		);
 	}
 }
@@ -41,7 +46,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.white,
 		borderRadius: 35,
 		borderWidth: 3,
-		flex: 1,
+		// flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderColor: colors.mediumGrey,

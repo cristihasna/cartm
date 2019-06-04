@@ -2,6 +2,7 @@ import { createDrawerNavigator } from 'react-navigation';
 
 import { Home, CurrentSession } from '../screens';
 import { DrawerContent } from '../components';
+import colors from '../style/colors';
 
 const AppNavigator = createDrawerNavigator(
 	{
@@ -13,7 +14,8 @@ const AppNavigator = createDrawerNavigator(
 			header: null
 		},
 		initialRouteName: 'Home',
-		contentComponent: DrawerContent
+		contentComponent: DrawerContent,
+		overlayColor: colors.darkPurple
 	}
 );
 

@@ -26,7 +26,7 @@ class Root extends Component {
 			profileImg: data.photoURL || null
 		});
 		this.props.loginUser(loginData);
-		this.props.fetchSession();
+		this.props.fetchSession(this.props.navigation);
 		this._navigateTo('AppNavigator');
 	}
 

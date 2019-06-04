@@ -20,7 +20,7 @@ class DrawerContent extends Component {
 	_handleLogout() {
 		logoutUser();
 		firebase.auth().signOut().then(() => {
-			logoutUser();
+			this.props.logoutUser();
 			this.props.navigation.navigate('RootNavigator');
 		});
 	}
@@ -30,7 +30,7 @@ class DrawerContent extends Component {
 
 		return (
 			<ScrollView style={styles.container}>
-				<View style={[ styles.profileContainer, styles.separatorAfter ]}>
+				{login && <View style={[ styles.profileContainer, styles.separatorAfter ]}>
 					<View style={styles.profileImgContainer}>
 						{login.profileImg ? (
 							<Image style={styles.profileImg} source={{ uri: login.profileImg }} />
@@ -39,7 +39,7 @@ class DrawerContent extends Component {
 						)}
 					</View>
 					<Text style={styles.displayName}>{login.displayName}</Text>
-				</View>
+				</View>}
 				{session ? (
 					<DrawerItem
 						label={'Current session'}
@@ -84,7 +84,7 @@ const mapStateToProps = (state) => ({
 	session: state.session
 });
 
-export default connect(mapStateToProps,  {createSession})(DrawerContent);
+export default connect(mapStateToProps,  {createSession, logoutUser})(DrawerContent);
 
 const styles = StyleSheet.create({
 	separatorAfter: {

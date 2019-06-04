@@ -22,7 +22,7 @@ class Login extends Component {
 
 	_loginUser(data) {
 		this.props.loginUser(data);
-		this.props.fetchSession();
+		this.props.fetchSession(this.props.navigation);
 		this.props.navigation.navigate('AppNavigator');
 	}
 
@@ -66,7 +66,7 @@ class Login extends Component {
 			if (data.code === 'auth/invalid-email') {
 				highlighted.email = true;
 				this._showToast('Email is invalid');
-			} else if (data.code === 'auth/invalid-password') {
+			} else if (data.code === 'auth/wrong-password') {
 				highlighted.password = true;
 				this._showToast('Wrong password');
 			} else if (data.code === 'auth/user-not-found') {

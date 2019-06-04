@@ -64,6 +64,7 @@
 		4D533738D8BE4E2882A280BB /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D73B1055611B4F92A3735EA2 /* libRNGestureHandler.a */; };
 		8E249B59F7284061BE0FD6AF /* libRNGestureHandler-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 06C8E37393654733BB121E18 /* libRNGestureHandler-tvOS.a */; };
 		ADE234916F084C10B6EF81BE /* libRCTToast.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A41C4A0028554400BE7A1007 /* libRCTToast.a */; };
+		BFDAA8A4DB5E4A5DBAF49003 /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD123B9646A748FAB6241504 /* libRNCamera.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -403,6 +404,8 @@
 		06C8E37393654733BB121E18 /* libRNGestureHandler-tvOS.a */ = {isa = PBXFileReference; name = "libRNGestureHandler-tvOS.a"; path = "libRNGestureHandler-tvOS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		1A580C5B334F4F929916E9CB /* RCTToast.xcodeproj */ = {isa = PBXFileReference; name = "RCTToast.xcodeproj"; path = "../node_modules/react-native-toast/ios/RCTToast.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		A41C4A0028554400BE7A1007 /* libRCTToast.a */ = {isa = PBXFileReference; name = "libRCTToast.a"; path = "libRCTToast.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		F42304505A244016B32DB0A8 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; name = "RNCamera.xcodeproj"; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		AD123B9646A748FAB6241504 /* libRNCamera.a */ = {isa = PBXFileReference; name = "libRNCamera.a"; path = "libRNCamera.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -438,6 +441,7 @@
 				5F54FFCD0B644411A04BDCE8 /* libRNGoogleSignin.a in Frameworks */,
 				4D533738D8BE4E2882A280BB /* libRNGestureHandler.a in Frameworks */,
 				ADE234916F084C10B6EF81BE /* libRCTToast.a in Frameworks */,
+				BFDAA8A4DB5E4A5DBAF49003 /* libRNCamera.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,6 +641,7 @@
 				97A5F73700314D9DA80EA103 /* RNGoogleSignin.xcodeproj */,
 				43F002B2162F445EAB297264 /* RNGestureHandler.xcodeproj */,
 				1A580C5B334F4F929916E9CB /* RCTToast.xcodeproj */,
+				F42304505A244016B32DB0A8 /* RNCamera.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1313,6 +1318,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1323,6 +1329,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Debug;
@@ -1354,6 +1361,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1364,6 +1372,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Release;
@@ -1393,6 +1402,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Debug;
@@ -1421,6 +1431,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Release;
@@ -1460,6 +1471,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1470,6 +1482,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Debug;
@@ -1509,6 +1522,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1519,6 +1533,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Release;
@@ -1557,6 +1572,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1567,6 +1583,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Debug;
@@ -1605,6 +1622,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1615,6 +1633,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-google-signin\ios\RNGoogleSignin",
 					"$(SRCROOT)\..\node_modules\react-native-gesture-handler\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-toast\ios\RCTToast",
+					"$(SRCROOT)\..\node_modules\react-native-camera\ios/**",
 				);
 			};
 			name = Release;

@@ -96,13 +96,18 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/androidx.exifinterface_exifinterface.version'
+    }
     defaultConfig {
         applicationId "com.cartm"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        missingDimensionStrategy 'react-native-camera', 'mlkit'// <-- insert this line
+        multiDexEnabled true
     }
     splits {
         abi {
@@ -134,6 +139,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-camera')
+    implementation 'com.android.support:multidex:1.0.3'
     implementation project(':react-native-gesture-handler')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:23.0.1"
@@ -146,10 +153,10 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     // Firebase dependencies
-    implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
-    implementation "com.google.android.gms:play-services-base:16.0.1"
-    implementation "com.google.firebase:firebase-core:16.0.6"
-    implementation "com.google.firebase:firebase-auth:16.1.0"
+    implementation 'com.facebook.android:facebook-android-sdk:5.0.1'
+    implementation "com.google.android.gms:play-services-base:16.1.0"
+    implementation "com.google.firebase:firebase-core:16.0.9"
+    implementation "com.google.firebase:firebase-auth:17.0.0"
 }
 
 // Run this once to be able to run the application with BUCK
@@ -160,3 +167,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply plugin: 'com.google.gms.google-services'
+com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
