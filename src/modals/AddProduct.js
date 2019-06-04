@@ -56,7 +56,11 @@ const NutrientLevels = ({ nutrients }) => {
 				<Text style={[ styles.offNutrient, { fontWeight: 'bold' } ]}>{nutrients[key]}</Text>
 			</View>
 		);
-	return <View style={{ marginBottom: 20, marginTop: 10 }}>{levels}</View>;
+	return (
+		<View style={{ marginBottom: 20, marginTop: 10 }}>
+			{levels.length ? levels : <Text style={[ styles.offNutrient, { fontWeight: 'bold' } ]}>not specified</Text>}
+		</View>
+	);
 };
 
 export default class AddProductModal extends Component {
@@ -79,20 +83,20 @@ export default class AddProductModal extends Component {
 		const barcode = e.data;
 		// fetch open food facts data
 		fetchOpenFoodFactsAPI(barcode)
-			.then((data) => {
+			.then(async (data) => {
 				let currentState = this.state;
 				if (data) {
 					currentState.openFoodFactsData = data;
 					currentState.name = data.name;
 					currentState.showCamera = false;
 					currentState.barcode = barcode;
-					Image.getSize(data.image_url, (offImageW, offImageH) => this.setState({ offImageW, offImageH }));
+					if (data.image_url)
+						Image.getSize(data.image_url, (offImageW, offImageH) =>
+							this.setState({ offImageW, offImageH })
+						);
 					// fetch other instances of this product, for unit price references
-					fetchProducts(data.name)
-						.then((products) => {
-							if (products.length > 0) currentState.price = products[0].unitPrice;
-						})
-						.catch(() => {});
+					const product = await fetchProducts(data.name);
+					if (product) currentState.price = '' + product.unitPrice.toFixed(2);
 				} else {
 					ToastAndroid.show(`Could not find any product for  '${barcode}'`, ToastAndroid.LONG);
 				}
@@ -165,13 +169,17 @@ export default class AddProductModal extends Component {
 		this.setState({ visible: false });
 	}
 
+	_handleBackPress() {
+		if (this.state.showCamera) this.setState({ showCamera: false });
+		else this.setState({ visible: false });
+	}
 	_handleAddProduct() {
 		const product = {
 			barcode: this.state.barcode,
 			name: this.state.name,
 			price: parseFloat(this.state.price),
 			quantity: parseInt(this.state.quantity),
-			participants: this.state.users.map((participant) => participant.email)
+			participants: this.state.users.length ? this.state.users.map((participant) => participant.email) : undefined
 		};
 		this.props.onAddProduct(product);
 	}
@@ -232,8 +240,10 @@ export default class AddProductModal extends Component {
 			imageW = imageH * aspectRatio;
 			flexDirection = 'row';
 			if (productName.length > 20)
-				productName = productName.slice(0, 12) + '...' + productName.slice(productName.length - 5);
+				productName = productName.slice(0, 10) + '...' + productName.slice(productName.length - 7);
 		}
+		if (productName.length > 30)
+			productName = productName.slice(0, 20) + '...' + productName.slice(productName.length - 7);
 		const containerStyle = {
 			marginTop: aspectRatio > 1.5 ? 5 : 0,
 			marginLeft: aspectRatio > 1.5 ? 0 : 10,
@@ -250,7 +260,7 @@ export default class AddProductModal extends Component {
 						style={{ width: imageW, height: imageH }}
 					/>
 					<View style={containerStyle}>
-						<Text style={styles.offName}>{this.state.name}</Text>
+						<Text style={styles.offName}>{productName}</Text>
 						<View style={styles.offImages}>
 							<Image
 								style={{ height: 50, width: 90 }}
@@ -273,10 +283,8 @@ export default class AddProductModal extends Component {
 						</Text>
 					</Text>
 					<Text style={[ styles.offNutrient, { marginTop: 10 } ]}>Nutrient levels:</Text>
-					{this.state.openFoodFactsData.nutrient_levels ? (
+					{this.state.openFoodFactsData.nutrient_levels && (
 						<NutrientLevels nutrients={this.state.openFoodFactsData.nutrient_levels} />
-					) : (
-						<Text style={{ color: colors.purple }}>not specified</Text>
 					)}
 				</View>
 			</React.Fragment>
@@ -379,7 +387,7 @@ export default class AddProductModal extends Component {
 				visible={this.state.visible}
 				animationType={'fade'}
 				transparent={true}
-				onRequestClose={this.hide.bind(this)}>
+				onRequestClose={this._handleBackPress.bind(this)}>
 				<TouchableOpacity activeOpacity={0.7} style={styles.background} onPress={this.hide.bind(this)} />
 				{this.state.showCamera ? this._renderCamera() : this._renderModalContent()}
 			</Modal>

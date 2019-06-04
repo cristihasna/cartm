@@ -13,13 +13,14 @@ export default async (name) => {
 			Accepts: 'application/json'
 		}
 	})
-		.then((res) => {console.log(res); return res.json().then((data) => ({ status: res.status, body: data }))})
+		.then((res) => {
+			return res.json().then((data) => ({ status: res.status, body: data }));
+		})
 		.then((res) => {
 			if (res.status === 200) return res.body;
-			return [];
+			return null;
 		})
 		.catch((err) => {
-            console.log(err);
-			return [];
+			return null;
 		});
 };
