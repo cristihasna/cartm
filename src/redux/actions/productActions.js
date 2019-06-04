@@ -36,6 +36,38 @@ export const addProduct = (product) => async (dispatch) => {
 	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
+export const patchProduct = (product) => async (dispatch) => {
+	// set loading true
+	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
+	// get user email and IDToken
+	const user = firebase.auth().currentUser;
+	const IDToken = await user.getIdToken();
+	const url = `${API_BASE_URL}/sessions/${user.email}/products/${product._id}`;
+
+	// PATCH to /sessions/{user email}/products/{product id} to patch the product instance
+	console.log(`[PATCH] ${url}`);
+	fetch(url, {
+		method: 'PATCH',
+		body: JSON.stringify(product),
+		headers: {
+			Authorization: `Bearer ${IDToken}`,
+			'Content-Type': 'application/json',
+			Accepts: 'application/json'
+		}
+	})
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+		.then((res) => {
+			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			else throw Error(res.body.message);
+		})
+		.catch((err) => {
+			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+		});
+
+	// set loading false
+	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+};
+
 export const addParticipantToProduct = (product, participant) => async (dispatch) => {
 	// set loading true
 	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
@@ -50,7 +82,7 @@ export const addParticipantToProduct = (product, participant) => async (dispatch
 	console.log(`[POST] ${url}`);
 	fetch(url, {
 		method: 'POST',
-		body: JSON.stringify({ participant }), 
+		body: JSON.stringify({ participant }),
 		headers: {
 			Authorization: `Bearer ${IDToken}`,
 			'Content-Type': 'application/json',

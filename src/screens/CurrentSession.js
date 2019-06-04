@@ -6,6 +6,7 @@ import { AddProduct, SessionParticipantsManager, ProductParticipantsManager } fr
 import { leaveSession, addParticipantToSession, removeParticipantFromSession } from '../redux/actions/sessionActions';
 import {
 	addProduct,
+	patchProduct,
 	removeProduct,
 	addParticipantToProduct,
 	removeParticipantFromProduct
@@ -55,6 +56,10 @@ class CurrentSession extends Component {
 		}
 	}
 
+	_handlePatchProduct (product){
+		this.props.patchProduct(product);
+	}
+
 	_handleRemoveProduct(product) {
 		this.props.removeProduct(product);
 	}
@@ -99,6 +104,7 @@ class CurrentSession extends Component {
 					participants={this.props.session.participants}
 					onRemoveProduct={this._handleRemoveProduct.bind(this)}
 					onParticipantsTrigger={this._showProductParticipantsModal.bind(this)}
+					onPatchProduct={this._handlePatchProduct.bind(this)}
 				/>
 				<View style={styles.productsButtonsGroup}>
 					<View style={styles.productsButtonsWrapper}>
@@ -159,6 +165,7 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
 	leaveSession,
 	addProduct,
+	patchProduct,
 	removeProduct,
 	addParticipantToSession,
 	removeParticipantFromSession,

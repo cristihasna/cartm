@@ -10,7 +10,12 @@ import { normalizeUserData } from '../lib';
 export default class Product extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { marginBottom: new Animated.Value(0), opacity: 1 };
+		this.state = {
+			marginBottom: new Animated.Value(0),
+			opacity: 1,
+			unitPrice: props.product.unitPrice.toString(),
+			quantity: props.product.quantity.toString()
+		};
 	}
 
 	_handleRemoveButton() {
@@ -21,6 +26,46 @@ export default class Product extends Component {
 		}).start();
 		this.setState({ opacity: 0 });
 		this.props.onRemove(this.props.product);
+	}
+
+	_handlePriceChange(unitPrice) {
+		this.setState({ unitPrice });
+	}
+
+	_handlePriceBlur() {
+		let price = parseFloat(this.state.unitPrice);
+		if (isNaN(price)) {
+			this.setState({ unitPrice: this.props.product.unitPrice });
+			ToastAndroid.show('Invalid price', ToastAndroid.SHORT);
+		} else {
+			this.setState({ unitPrice: price.toString() });
+			let newProduct = this.props.product;
+			newProduct.unitPrice = price;
+			this.props.onPatch(newProduct);
+		}
+	}
+
+	isValidQuantity(quantity) {
+		if (isNaN(quantity)) return false;
+		if (quantity < 1 || quantity > 10) return false;
+		return true;
+	}
+	
+	_handleQuantityChange(quantity) {
+		this.setState({ quantity });
+	}
+
+	_handleQuantityBlur() {
+		let quantity = parseInt(this.state.quantity);
+		if (!this.isValidQuantity(quantity)) {
+			this.setState({ quantity: this.props.product.quantity });
+			ToastAndroid.show('Invalid quantity', ToastAndroid.SHORT);
+		} else {
+			this.setState({ quantity: quantity.toString() });
+			let newProduct = this.props.product;
+			newProduct.unitPrice = quantity;
+			this.props.onPatch(newProduct);
+		}
 	}
 
 	renderCloseButton(progress, dragX) {
@@ -39,7 +84,7 @@ export default class Product extends Component {
 	}
 
 	render() {
-		const { product, unitPrice, quantity, participants } = this.props.product;
+		const { product, participants } = this.props.product;
 		return (
 			<Swipeable
 				containerStyle={{ marginBottom: this.state.marginBottom, opacity: this.state.opacity }}
@@ -48,30 +93,34 @@ export default class Product extends Component {
 				renderRightActions={this.renderCloseButton.bind(this)}
 				leftThreshold={50}>
 				<View style={styles.container}>
-					<TouchableOpacity onPress={this.props.onTitleTrigger} style={styles.productTitleContainer}>
+					<View style={styles.productTitleContainer}>
 						<Text style={styles.productTitle}>
 							{product.name.length <= 25 ? product.name : product.name.substr(0, 22) + '...'}
 						</Text>
-					</TouchableOpacity>
+					</View>
 					<View style={styles.inputsContainer}>
 						<TextInput
 							style={styles.priceInput}
-							value={unitPrice.toString()}
+							value={this.state.unitPrice}
 							keyboardType="numeric"
-							onChange={this.props.onPriceChange}
+							onChangeText={this._handlePriceChange.bind(this)}
+							onBlur={this._handlePriceBlur.bind(this)}
 						/>
 						<Icon name="times" style={styles.timesIcon} />
 						<TextInput
 							style={styles.quantityInput}
-							value={quantity.toString()}
+							value={this.state.quantity}
 							keyboardType="numeric"
-							onChange={this.props.onQuantityChange}
+							onChangeText={this._handleQuantityChange.bind(this)}
+							onBlur={this._handleQuantityBlur.bind(this)}
 						/>
 					</View>
 					<TouchableOpacity onPress={this.props.onParticipantsTrigger} style={styles.participantsContainer}>
 						<ParticipantsList
 							participants={participants.map((email) =>
-								normalizeUserData((this.props.participants.find((other) => other.email === email)).profile)
+								normalizeUserData(
+									this.props.participants.find((other) => other.email === email).profile
+								)
 							)}
 						/>
 					</TouchableOpacity>
@@ -84,11 +133,9 @@ export default class Product extends Component {
 Product.propTypes = {
 	product: PropTypes.object.isRequired,
 	participants: PropTypes.array.isRequired,
-	onPriceChange: PropTypes.func.isRequired,
-	onQuantityChange: PropTypes.func.isRequired,
-	onTitleTrigger: PropTypes.func.isRequired,
 	onParticipantsTrigger: PropTypes.func.isRequired,
-	onRemove: PropTypes.func.isRequired
+	onRemove: PropTypes.func.isRequired,
+	onPatch: PropTypes.func.isRequired
 };
 
 const styles = StyleSheet.create({

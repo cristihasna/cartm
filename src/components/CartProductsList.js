@@ -15,12 +15,10 @@ export default class CartProductsList extends Component {
 					return (
 						<Product
 							product={item}
-                            onRemove={this.props.onRemoveProduct}
+							onRemove={this.props.onRemoveProduct}
 							participants={this.props.participants}
-							onPriceChange={(price) => console.log(`new price: ${price}`)}
-							onQuantityChange={(quantity) => console.log(`new quantity: ${quantity}`)}
-							onTitleTrigger={() => console.log('title trigged')}
 							onParticipantsTrigger={() => this.props.onParticipantsTrigger(item)}
+							onPatch={this.props.onPatchProduct}
 						/>
 					);
 				}}
@@ -32,8 +30,9 @@ export default class CartProductsList extends Component {
 CartProductsList.propTypes = {
 	products: PropTypes.array.isRequired,
 	participants: PropTypes.array.isRequired,
-    onParticipantsTrigger: PropTypes.func.isRequired,
-    onRemoveProduct: PropTypes.func.isRequired
+	onParticipantsTrigger: PropTypes.func.isRequired,
+	onRemoveProduct: PropTypes.func.isRequired,
+	onPatchProduct: PropTypes.func.isRequired
 };
 
 const styles = StyleSheet.create({
