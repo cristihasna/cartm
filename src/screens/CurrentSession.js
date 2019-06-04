@@ -56,7 +56,7 @@ class CurrentSession extends Component {
 		}
 	}
 
-	_handlePatchProduct (product){
+	_handlePatchProduct(product) {
 		this.props.patchProduct(product);
 	}
 
@@ -109,7 +109,12 @@ class CurrentSession extends Component {
 				<View style={styles.productsButtonsGroup}>
 					<View style={styles.productsButtonsWrapper}>
 						<RoundButton iconName="times" onPress={() => this.props.leaveSession(this.props.navigation)} />
-						<RoundButton iconName="cart-plus" onPress={this._showAddProductModal.bind(this)} large={true} />
+						<RoundButton
+							iconName={this.props.loading ? 'circle-notch' : 'cart-plus'}
+							onPress={this._showAddProductModal.bind(this)}
+							large
+							{...this.props.loading && { spinning: true }}
+						/>
 						<RoundButton iconName="credit-card" onPress={() => console.warn('summary')} />
 					</View>
 				</View>
@@ -159,7 +164,8 @@ class CurrentSession extends Component {
 
 const mapStateToProps = (state) => ({
 	login: state.login,
-	session: state.session
+	session: state.session,
+	loading: state.loading
 });
 
 export default connect(mapStateToProps, {

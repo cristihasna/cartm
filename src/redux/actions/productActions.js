@@ -27,13 +27,14 @@ export const addProduct = (product) => async (dispatch) => {
 		.then((res) => {
 			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
 export const patchProduct = (product) => async (dispatch) => {
@@ -59,13 +60,16 @@ export const patchProduct = (product) => async (dispatch) => {
 		.then((res) => {
 			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
+
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
-		});
 
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+		});
 };
 
 export const addParticipantToProduct = (product, participant) => async (dispatch) => {
@@ -93,13 +97,15 @@ export const addParticipantToProduct = (product, participant) => async (dispatch
 		.then((res) => {
 			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
 
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
 export const removeParticipantFromProduct = (product, participant) => async (dispatch) => {
@@ -126,13 +132,14 @@ export const removeParticipantFromProduct = (product, participant) => async (dis
 		.then((res) => {
 			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
 export const removeProduct = (product) => async (dispatch) => {
@@ -158,11 +165,12 @@ export const removeProduct = (product) => async (dispatch) => {
 		.then((res) => {
 			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };

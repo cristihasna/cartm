@@ -25,13 +25,14 @@ export const createSession = (navigation) => async (dispatch) => {
 			if (res.status === 201) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else if (res.status !== 400) throw Error(res.body.message);
 			if (navigation) navigation.navigate('CurrentSession');
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
 export const addParticipantToSession = (email) => async (dispatch) => {
@@ -58,13 +59,14 @@ export const addParticipantToSession = (email) => async (dispatch) => {
 		.then((res) => {
 			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
 export const removeParticipantFromSession = (email) => async (dispatch) => {
@@ -90,13 +92,14 @@ export const removeParticipantFromSession = (email) => async (dispatch) => {
 		.then((res) => {
 			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 			else throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
 export const fetchSession = (navigation) => async (dispatch) => {
@@ -121,13 +124,14 @@ export const fetchSession = (navigation) => async (dispatch) => {
 				dispatch({ type: UPDATE_SESSION, sessionData: res.body });
 				if (navigation) navigation.navigate('CurrentSession');
 			} else if (res.status !== 404) throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
 
 export const leaveSession = (navigation) => async (dispatch) => {
@@ -152,11 +156,12 @@ export const leaveSession = (navigation) => async (dispatch) => {
 			if (res.status !== 200) throw Error(res.body.message);
 			dispatch({ type: LEAVE_SESSION });
 			if (navigation) navigation.navigate('Home');
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
 		.catch((err) => {
 			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
-
-	// set loading false
-	dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 };
