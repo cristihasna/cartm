@@ -1,21 +1,109 @@
 import React, { Component } from 'react';
-import { Text, View, Modal, TouchableOpacity, TextInput, StyleSheet, ToastAndroid } from 'react-native';
+import {
+	Text,
+	View,
+	Modal,
+	TouchableOpacity,
+	TextInput,
+	Image,
+	StyleSheet,
+	ToastAndroid,
+	KeyboardAvoidingView,
+	Dimensions
+} from 'react-native';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
-import { normalizeUserData } from '../lib';
-import { HorizontalSeparator, RoundButton, ParticipantsList } from '../components';
+import { normalizeUserData, fetchOpenFoodFactsAPI, fetchProducts } from '../lib';
+import { HorizontalSeparator, RoundButton, ParticipantsList, SpinningIcon } from '../components';
+import { RNCamera } from 'react-native-camera';
+
+const nutriscores = {
+	a: require('../../assets/nutriscore_a.png'),
+	b: require('../../assets/nutriscore_b.png'),
+	c: require('../../assets/nutriscore_c.png'),
+	d: require('../../assets/nutriscore_d.png'),
+	e: require('../../assets/nutriscore_e.png')
+};
+
+const nova_group = {
+	'1': require('../../assets/nova_1.png'),
+	'2': require('../../assets/nova_2.png'),
+	'3': require('../../assets/nova_3.png'),
+	'4': require('../../assets/nova_4.png')
+};
+
+const NutrientLevels = ({ nutrients }) => {
+	let levels = [];
+	const circleColors = {
+		high: colors.googleColor,
+		moderate: colors.darkPurple,
+		low: colors.purple
+	};
+	for (let key of Object.keys(nutrients))
+		levels.push(
+			<View style={styles.offNutrientContainer}>
+				<Icon
+					name="circle"
+					style={{ fontSize: 30, color: circleColors[nutrients[key]], marginRight: 10 }}
+					solid
+				/>
+				<Text style={styles.offNutrient}>{key.replace('-', ' ')}</Text>
+				<Icon
+					name="long-arrow-alt-right"
+					style={{ fontSize: 20, color: colors.purple, marginHorizontal: 10 }}
+				/>
+				<Text style={[ styles.offNutrient, { fontWeight: 'bold' } ]}>{nutrients[key]}</Text>
+			</View>
+		);
+	return <View style={{ marginBottom: 20, marginTop: 10 }}>{levels}</View>;
+};
 
 export default class AddProductModal extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { visible: false, quantity: '1', users: [] };
+		this.state = { visible: false, quantity: '1', users: [], showCamera: false };
 	}
 
 	isValidQuantity(quantity) {
 		if (isNaN(quantity)) return false;
 		if (quantity < 1 || quantity > 10) return false;
 		return true;
+	}
+
+	_initCamera() {
+		this.setState({ showCamera: true });
+	}
+
+	_handleBarcodeRead(e) {
+		const barcode = e.data;
+		// fetch open food facts data
+		fetchOpenFoodFactsAPI(barcode)
+			.then((data) => {
+				let currentState = this.state;
+				if (data) {
+					currentState.openFoodFactsData = data;
+					currentState.name = data.name;
+					currentState.showCamera = false;
+					currentState.barcode = barcode;
+					Image.getSize(data.image_url, (offImageW, offImageH) => this.setState({ offImageW, offImageH }));
+					// fetch other instances of this product, for unit price references
+					fetchProducts(data.name)
+						.then((products) => {
+							if (products.length > 0) currentState.price = products[0].unitPrice;
+						})
+						.catch(() => {});
+				} else {
+					ToastAndroid.show(`Could not find any product for  '${barcode}'`, ToastAndroid.LONG);
+				}
+				this.setState(currentState);
+			})
+			.catch((e) => {});
+	}
+
+	_handleBarcodeInput(e) {
+		const data = e.nativeEvent.text;
+		this._handleBarcodeRead({ data });
 	}
 
 	_handleNameChange(name) {
@@ -61,7 +149,16 @@ export default class AddProductModal extends Component {
 	}
 
 	show() {
-		this.setState({ visible: true, price: undefined, name: undefined, quantity: '1' });
+		this.setState({
+			visible: true,
+			price: undefined,
+			name: undefined,
+			quantity: '1',
+			openFoodFactsData: undefined,
+			loading: false,
+			offImageH: undefined,
+			offImageW: undefined
+		});
 	}
 
 	hide() {
@@ -79,6 +176,202 @@ export default class AddProductModal extends Component {
 		this.props.onAddProduct(product);
 	}
 
+	_renderCamera() {
+		return (
+			<View style={styles.container}>
+				<View style={styles.cameraPreviewContainer}>
+					<Text style={styles.cameraTitle}>Scan the barcode</Text>
+					<View style={styles.cameraContainer}>
+						<RNCamera
+							ref={(ref) => {
+								this.camera = ref;
+							}}
+							type={RNCamera.Constants.Type.back}
+							style={styles.camera}
+							onBarCodeRead={this._handleBarcodeRead.bind(this)}
+							captureAudio={false}
+						/>
+						<View style={[ styles.cameraCover, styles.coverTop ]} />
+						<View style={[ styles.cameraCover, styles.coverBottom ]} />
+						<View style={[ styles.cameraCover, styles.coverLeft ]} />
+						<View style={[ styles.cameraCover, styles.coverRight ]} />
+						<View style={styles.barcodeLine} />
+					</View>
+					<Text style={styles.barcodeCaption}>Having Trouble?</Text>
+					<Text style={styles.barcodeCaption}>Manually enter the code bellow</Text>
+					<KeyboardAvoidingView behavior="padding">
+						<TextInput
+							keyboardType="number-pad"
+							style={styles.barcodeInput}
+							placeholder="barcode"
+							maxLength={13}
+							onEndEditing={this._handleBarcodeInput.bind(this)}
+							placeholderTextColor={colors.purple}
+						/>
+					</KeyboardAvoidingView>
+				</View>
+			</View>
+		);
+	}
+
+	_renderOpenFoodFacts() {
+		const min = (a, b) => (a > b ? b : a);
+		const aspectRatio = this.state.offImageW / this.state.offImageH;
+		let imageW,
+			imageH,
+			flexDirection = 'row',
+			productName = this.state.openFoodFactsData.name;
+		if (!aspectRatio) {
+			imageH = imageW = 0;
+		} else if (aspectRatio > 1.5) {
+			imageH = min((Dimensions.get('window').width - 80) / aspectRatio, 50);
+			imageW = imageH * aspectRatio;
+			flexDirection = 'column';
+		} else if (aspectRatio <= 1.5) {
+			imageH = 120;
+			imageW = imageH * aspectRatio;
+			flexDirection = 'row';
+			if (productName.length > 20)
+				productName = productName.slice(0, 12) + '...' + productName.slice(productName.length - 5);
+		}
+		const containerStyle = {
+			marginTop: aspectRatio > 1.5 ? 5 : 0,
+			marginLeft: aspectRatio > 1.5 ? 0 : 10,
+			flex: 1,
+			height: 70,
+			flexDirection: 'column'
+		};
+		return (
+			<React.Fragment>
+				<View style={[ styles.offHeader, { flexDirection } ]}>
+					<Image
+						source={{ uri: this.state.openFoodFactsData.image_url }}
+						resizeMode={'contain'}
+						style={{ width: imageW, height: imageH }}
+					/>
+					<View style={containerStyle}>
+						<Text style={styles.offName}>{this.state.name}</Text>
+						<View style={styles.offImages}>
+							<Image
+								style={{ height: 50, width: 90 }}
+								resizeMode="contain"
+								source={nutriscores[this.state.openFoodFactsData.nutrition_grade]}
+							/>
+							<Image
+								style={{ height: 50, width: 30 }}
+								resizeMode="contain"
+								source={nova_group[this.state.openFoodFactsData.nova_group]}
+							/>
+						</View>
+					</View>
+				</View>
+				<View style={{ marginTop: 10 }}>
+					<Text style={styles.offNutrient}>
+						Allergens:{' '}
+						<Text style={{ fontWeight: 'bold' }}>
+							{this.state.openFoodFactsData.allergens || 'not specified'}
+						</Text>
+					</Text>
+					<Text style={[ styles.offNutrient, { marginTop: 10 } ]}>Nutrient levels:</Text>
+					{this.state.openFoodFactsData.nutrient_levels ? (
+						<NutrientLevels nutrients={this.state.openFoodFactsData.nutrient_levels} />
+					) : (
+						<Text style={{ color: colors.purple }}>not specified</Text>
+					)}
+				</View>
+			</React.Fragment>
+		);
+	}
+
+	_renderModalContent() {
+		const manualInput = this.state.openFoodFactsData ? (
+			this._renderOpenFoodFacts()
+		) : (
+			<React.Fragment>
+				<View style={styles.barcodeTriggerContainer}>
+					<TouchableOpacity onPress={this._initCamera.bind(this)} style={styles.barcodeTrigger}>
+						<Icon name="barcode" style={styles.barcodeIcon} />
+					</TouchableOpacity>
+					<Text style={styles.triggerLabel}>Scan barcode</Text>
+				</View>
+				<HorizontalSeparator
+					lineColor={colors.purple}
+					text="or"
+					textColor={colors.darkPurple}
+					bgColor={colors.lightGrey}
+				/>
+				<View style={styles.inputContainer}>
+					<TextInput
+						style={styles.input}
+						placeholder="Add a name for now"
+						placeholderTextColor={colors.purple}
+						value={this.state.name}
+						onChangeText={this._handleNameChange.bind(this)}
+					/>
+				</View>
+			</React.Fragment>
+		);
+		return (
+			<View style={styles.container}>
+				{this.state.loading ? (
+					<View style={styles.loadingIconContainer}>
+						<SpinningIcon name="circle-notch" style={styles.loadingIcon} cycleTime={2500} />
+					</View>
+				) : (
+					manualInput
+				)}
+				<View style={styles.inputContainer}>
+					<View style={styles.inputWrapper}>
+						<Text style={styles.inputLabel}>It costs</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="0.00"
+							placeholderTextColor={colors.purple}
+							value={this.state.price}
+							onChangeText={this._handlePriceChange.bind(this)}
+							onBlur={this._handlePriceBlur.bind(this)}
+							keyboardType="numeric"
+						/>
+					</View>
+				</View>
+				<View style={styles.inputContainer}>
+					<View style={styles.inputWrapper}>
+						<Text style={styles.inputLabel}>Quantity:</Text>
+						<TextInput
+							style={styles.input}
+							placeholder="1"
+							placeholderTextColor={colors.purple}
+							value={this.state.quantity}
+							onChangeText={this._handleQuantityChange.bind(this)}
+							onBlur={this._handleQuantityBlur.bind(this)}
+							keyboardType="numeric"
+						/>
+					</View>
+				</View>
+				<View style={styles.buttonsContainer}>
+					<View style={styles.buttonPlaceholder}>
+						<ParticipantsList
+							participants={this.state.users.map((participant) => normalizeUserData(participant.profile))}
+						/>
+					</View>
+					<RoundButton
+						iconName="cart-plus"
+						onPress={this._handleAddProduct.bind(this)}
+						containerStyle={{ backgroundColor: colors.darkPurple }}
+						large
+					/>
+					<RoundButton
+						iconName="user-plus"
+						onPress={() =>
+							this.props.onParticipantsTrigger({
+								participants: this.state.users.map((p) => p.email)
+							})}
+					/>
+				</View>
+			</View>
+		);
+	}
+
 	render() {
 		return (
 			<Modal
@@ -88,79 +381,7 @@ export default class AddProductModal extends Component {
 				transparent={true}
 				onRequestClose={this.hide.bind(this)}>
 				<TouchableOpacity activeOpacity={0.7} style={styles.background} onPress={this.hide.bind(this)} />
-				<View style={styles.container}>
-					<View style={styles.barcodeTriggerContainer}>
-						<TouchableOpacity style={styles.barcodeTrigger}>
-							<Icon name="barcode" style={styles.barcodeIcon} />
-						</TouchableOpacity>
-						<Text style={styles.triggerLabel}>Scan barcode</Text>
-					</View>
-					<HorizontalSeparator
-						lineColor={colors.purple}
-						text="or"
-						textColor={colors.darkPurple}
-						bgColor={colors.lightGrey}
-					/>
-					<View style={styles.inputContainer}>
-						<TextInput
-							style={styles.input}
-							placeholder="Add a name for now"
-							placeholderTextColor={colors.purple}
-							value={this.state.name}
-							onChangeText={this._handleNameChange.bind(this)}
-						/>
-					</View>
-					<View style={styles.inputContainer}>
-						<View style={styles.inputWrapper}>
-							<Text style={styles.inputLabel}>It costs</Text>
-							<TextInput
-								style={styles.input}
-								placeholder="0.00"
-								placeholderTextColor={colors.purple}
-								value={this.state.price}
-								onChangeText={this._handlePriceChange.bind(this)}
-								onBlur={this._handlePriceBlur.bind(this)}
-								keyboardType="numeric"
-							/>
-						</View>
-					</View>
-					<View style={styles.inputContainer}>
-						<View style={styles.inputWrapper}>
-							<Text style={styles.inputLabel}>Quantity:</Text>
-							<TextInput
-								style={styles.input}
-								placeholder="1"
-								placeholderTextColor={colors.purple}
-								value={this.state.quantity}
-								onChangeText={this._handleQuantityChange.bind(this)}
-								onBlur={this._handleQuantityBlur.bind(this)}
-								keyboardType="numeric"
-							/>
-						</View>
-					</View>
-					<View style={styles.buttonsContainer}>
-						<View style={styles.buttonPlaceholder}>
-							<ParticipantsList
-								participants={this.state.users.map((participant) =>
-									normalizeUserData(participant.profile)
-								)}
-							/>
-						</View>
-						<RoundButton
-							iconName="cart-plus"
-							onPress={this._handleAddProduct.bind(this)}
-							containerStyle={{ backgroundColor: colors.darkPurple }}
-							large
-						/>
-						<RoundButton
-							iconName="user-plus"
-							onPress={() =>
-								this.props.onParticipantsTrigger({
-									participants: this.state.users.map((p) => p.email)
-								})}
-						/>
-					</View>
-				</View>
+				{this.state.showCamera ? this._renderCamera() : this._renderModalContent()}
 			</Modal>
 		);
 	}
@@ -192,6 +413,115 @@ const styles = StyleSheet.create({
 		margin: 20,
 		padding: 20,
 		backgroundColor: colors.lightGrey
+	},
+	offHeader: {
+		display: 'flex',
+		justifyContent: 'flex-start',
+		alignItems: 'flex-start'
+	},
+	offImage: {
+		height: 100,
+		width: (Dimensions.get('window').width - 80) / 2
+	},
+	offImages: {
+		marginTop: 5,
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
+	offName: {
+		fontSize: 24,
+		color: colors.purple
+	},
+	offNutrientContainer: {
+		marginVertical: 5,
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
+	offNutrient: {
+		color: colors.purple,
+		fontSize: 22
+	},
+	cameraPreviewContainer: {
+		height: 100 + '%',
+		height: 100 + '%'
+		// marginVertical: -20
+	},
+	cameraContainer: {
+		flex: 1,
+		marginHorizontal: -20,
+		marginBottom: 10,
+		backgroundColor: colors.black,
+		overflow: 'hidden'
+	},
+	camera: {
+		flex: 1,
+		backgroundColor: colors.white
+	},
+	barcodeLine: {
+		position: 'absolute',
+		backgroundColor: colors.googleColor,
+		width: 60 + '%',
+		height: 1,
+		top: 50 + '%',
+		left: 20 + '%'
+	},
+	cameraCover: {
+		position: 'absolute',
+		backgroundColor: colors.purple,
+		opacity: 0.5
+	},
+	coverTop: {
+		width: 100 + '%',
+		height: 15 + '%',
+		top: 0
+	},
+	coverBottom: {
+		width: 100 + '%',
+		height: 15 + '%',
+		bottom: 0
+	},
+	coverLeft: {
+		width: 5 + '%',
+		height: 70 + '%',
+		top: 15 + '%'
+	},
+	coverRight: {
+		width: 5 + '%',
+		height: 70 + '%',
+		top: 15 + '%',
+		right: 0
+	},
+	cameraTitle: {
+		fontSize: 28,
+		textAlign: 'center',
+		marginTop: -10,
+		marginBottom: 10,
+		color: colors.purple
+	},
+	barcodeCaption: {
+		fontSize: 18,
+		textAlign: 'center',
+		color: colors.purple
+	},
+	barcodeInput: {
+		borderBottomColor: colors.purple,
+		borderBottomWidth: 1,
+		fontSize: 24,
+		color: colors.purple,
+		letterSpacing: 5,
+		textAlign: 'center'
+	},
+	loadingIconContainer: {
+		width: 100 + '%',
+		paddingVertical: 20,
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	loadingIcon: {
+		color: colors.purple,
+		fontSize: 56
 	},
 	barcodeTriggerContainer: {
 		alignItems: 'center',
@@ -244,7 +574,7 @@ const styles = StyleSheet.create({
 	buttonPlaceholder: {
 		width: 56,
 		height: 56,
-		paddingRight:0,
+		paddingRight: 0,
 		justifyContent: 'center'
 	}
 });
