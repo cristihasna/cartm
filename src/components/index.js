@@ -11,6 +11,7 @@ import CartProductsList from './CartProductsList';
 import Product from './Product';
 import UserList from './UserList';
 import ScreenHeading from './ScreenHeading';
+import User from './User';
 
 module.exports = {
     Logo,
@@ -25,5 +26,6 @@ module.exports = {
     Product,
     ParticipantsList,
     UserList,
-    ScreenHeading
+    ScreenHeading,
+    User
 }
