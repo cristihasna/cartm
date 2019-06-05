@@ -1,13 +1,27 @@
-import { createDrawerNavigator } from 'react-navigation';
+import { createDrawerNavigator, createStackNavigator } from 'react-navigation';
 
-import { Home, CurrentSession } from '../screens';
+import { Home, CurrentSession, Summary } from '../screens';
 import { DrawerContent } from '../components';
 import colors from '../style/colors';
+
+const SessionNavigator = createStackNavigator(
+	{
+		CurrentSession,
+		Summary
+	},
+	{
+		defaultNavigationOptions:{
+			header: null
+		},
+		initialRouteName: 'CurrentSession'
+	}
+);
+
 
 const AppNavigator = createDrawerNavigator(
 	{
 		Home,
-		CurrentSession
+		SessionNavigator
 	},
 	{
 		defaultNavigationOptions:{
