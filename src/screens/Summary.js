@@ -28,6 +28,7 @@ class Summary extends Component {
     }
 
     componentWillReceiveProps(newProps){
+        if (!newProps.session) return;
         let state = this.state;
         for (let participant of newProps.session.participants){
             if (!state.hasOwnProperty(participant._id)) state[participant._id] = false;
@@ -35,6 +36,7 @@ class Summary extends Component {
         this.setState(state);
     }
 	render() {
+        if (!this.props.session) return null;
 		const participantsDict = {};
 		for (let participant of this.props.session.participants) {
 			participantsDict[participant.email] = normalizeUserData(participant.profile);
@@ -56,8 +58,6 @@ class Summary extends Component {
 				// user is participant of this product
 				let coParticipants = [];
 				for (let other of product.participants) {
-					// skip current user, as we will display just the co-participants
-					// if (other === participant.email) continue;
 					coParticipants.push(participantsDict[other]);
 				}
 				products.push(Object.assign(product, { coParticipants }));

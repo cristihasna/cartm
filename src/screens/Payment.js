@@ -4,7 +4,7 @@ import { ScreenHeading, ParticipantPayment, RoundButton } from '../components';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { normalizeUserData } from '../lib';
-import { setParticipantPayment } from '../redux/actions/sessionActions';
+import { setParticipantPayment, endSession } from '../redux/actions/sessionActions';
 
 class Payment extends Component {
 	_handlePaymentChange(participant, payment) {
@@ -12,6 +12,7 @@ class Payment extends Component {
 	}
 
 	render() {
+        if (!this.props.session) return null;
 		const session = this.props.session;
 		const total = session.products.reduce((total, product) => {
 			const cost = product.unitPrice * product.quantity;
@@ -50,7 +51,7 @@ class Payment extends Component {
 						iconName={this.props.loading ? 'circle-notch' : 'credit-card'}
 						onPress={() => {
 							if (this.props.loading || totalPayment !== total) return;
-							console.warn('payment');
+							this.props.endSession(this.props.navigation);
 						}}
 						large
 						{...this.props.loading && { spinning: true }}
@@ -66,7 +67,7 @@ const mapStateToProps = (state) => ({
 	loading: state.loading
 });
 
-export default connect(mapStateToProps, { setParticipantPayment })(Payment);
+export default connect(mapStateToProps, { setParticipantPayment, endSession })(Payment);
 
 const styles = StyleSheet.create({
 	container: {
