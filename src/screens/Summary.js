@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ScreenHeading, ParticipantSummary, RoundButton } from '../components';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
@@ -61,8 +61,8 @@ class Summary extends Component {
 					coParticipants.push(participantsDict[other]);
 				}
 				products.push(Object.assign(product, { coParticipants }));
-				participant.profile = participantsDict[participant.email];
 			}
+            participant.profile = participantsDict[participant.email];
 			participantsArray.push(
 				<ParticipantSummary
 					onToggle={this.handleToggle.bind(this)}
@@ -80,14 +80,14 @@ class Summary extends Component {
 						<Text style={styles.label}>Total: </Text>
 						<Text style={[ styles.accent, { fontSize: 28 } ]}>{total}</Text>
 					</View>
-					<Animated.ScrollView style={styles.participantsContainer}>
+					<ScrollView style={styles.participantsContainer}>
 						<View style={{ height: 25 }} />
 						{participantsArray}
 						<View style={{ height: 128 }} />
-					</Animated.ScrollView>
+					</ScrollView>
 				</View>
 				<View style={styles.productsButtonsWrapper}>
-					<RoundButton iconName="credit-card" onPress={() => console.warn('payment')} large />
+					<RoundButton iconName="credit-card" onPress={() => this.props.navigation.navigate('Payment')} large />
 				</View>
 			</View>
 		);

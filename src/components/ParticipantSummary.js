@@ -5,14 +5,14 @@ import ParticipantsList from './ParticipantsList';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
 
-export default (participant, collapsed) => {
+export default ({participant, collapsed, onToggle}) => {
 	const height = collapsed ? 'auto' : 0;
 	const opacity = collapsed ? 1 : 0;
 	return (
 		<TouchableOpacity
 			activeOpacity={0.75}
 			style={styles.participantContainer}
-			onPress={() => this.props.onToggle(participant._id)}>
+			onPress={() => onToggle(participant._id)}>
 			<User data={participant.profile} />
 			<View style={styles.hasBorderLeft}>
 				<View style={styles.dropdownContainer}>
