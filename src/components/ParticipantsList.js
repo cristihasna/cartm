@@ -1,10 +1,8 @@
-import React, { Component } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';
+import React from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import colors from '../style/colors';
 
-const Participant = (p, style) => {
-	const participant = p.participant;
+const Participant = ({ participant, style }) => {
 	return (
 		<View style={[ styles.participantContainer, style ]}>
 			{participant.photoURL ? (
@@ -16,24 +14,19 @@ const Participant = (p, style) => {
 	);
 };
 
-export default class ParticipantsList extends Component {
-	render() {
-		let participants;
-		if (this.props.participants.length === 0) participants = <Participant participant={{ profileImgReplacement: '?' }} />;
-		else if (this.props.participants.length <= 4)
-			participants = this.props.participants.map((p, i) => <Participant key={i} participant={p} />);
-		else
-			participants = this.props.participants
-				.slice(0, 3)
-				.concat({ profileImgReplacement: '...' })
-				.map((p, i) => <Participant key={i} participant={p} />);
-		return (
-			<View style={styles.container}>
-				{participants}
-			</View>
-		);
-	}
-}
+export default ({ participants, containerStyle, itemStyle }) => {
+	let participantsArr;
+	if (participants.length === 0)
+		participantsArr = <Participant style={itemStyle} participant={{ profileImgReplacement: '?' }} />;
+	else if (participants.length <= 4)
+		participantsArr = participants.map((p, i) => <Participant style={itemStyle} key={i} participant={p} />);
+	else
+		participantsArr = participants
+			.slice(0, 3)
+			.concat({ profileImgReplacement: '...' })
+			.map((p, i) => <Participant style={itemStyle} key={i} participant={p} />);
+	return <View style={[styles.container, containerStyle]}>{participantsArr}</View>;
+};
 
 const styles = StyleSheet.create({
 	container: {
@@ -68,7 +61,3 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	}
 });
-
-ParticipantsList.propTypes = {
-	participants: PropTypes.array.isRequired
-};

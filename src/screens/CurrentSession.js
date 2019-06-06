@@ -115,7 +115,7 @@ class CurrentSession extends Component {
 							large
 							{...this.props.loading && { spinning: true }}
 						/>
-						<RoundButton iconName="credit-card" onPress={() => console.warn('summary')} />
+						<RoundButton iconName="credit-card" onPress={() => this.props.navigation.navigate('Summary')} />
 					</View>
 				</View>
 			</View>

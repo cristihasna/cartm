@@ -42,7 +42,7 @@ const NutrientLevels = ({ nutrients }) => {
 	};
 	for (let key of Object.keys(nutrients))
 		levels.push(
-			<View style={styles.offNutrientContainer}>
+			<View key={key} style={styles.offNutrientContainer}>
 				<Icon
 					name="circle"
 					style={{ fontSize: 30, color: circleColors[nutrients[key]], marginRight: 10 }}
