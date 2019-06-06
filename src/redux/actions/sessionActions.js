@@ -102,6 +102,40 @@ export const removeParticipantFromSession = (email) => async (dispatch) => {
 		});
 };
 
+export const setParticipantPayment = (email, payment) => async (dispatch) => {
+	// set loading true
+	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
+
+	// get user email and IDToken
+	const user = firebase.auth().currentUser;
+	const IDToken = await user.getIdToken();
+	const url = `${API_BASE_URL}/sessions/${user.email}/participants/${email}/payment`;
+
+	// POST to /sessions/{user email}/participants/{participant email} to add user payment
+	console.log(`[POST] ${url}`);
+	fetch(url, {
+		body: JSON.stringify({ payment }),
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${IDToken}`,
+			'Content-Type': 'application/json',
+			Accepts: 'application/json'
+		}
+	})
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+		.then((res) => {
+			if (res.status === 200) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			else throw Error(res.body.message);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+		})
+		.catch((err) => {
+			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+		});
+};
+
 export const fetchSession = (navigation) => async (dispatch) => {
 	// set loading true
 	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
@@ -165,3 +199,34 @@ export const leaveSession = (navigation) => async (dispatch) => {
 			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		});
 };
+
+export const endSession = (navigation) => async (dispatch) => {
+	// set loading true
+	dispatch({type: LOADING_STATE_CHANGE, loading: true});
+	// get user email and IDToken
+	const user = firebase.auth().currentUser;
+	const IDToken = await user.getIdToken();
+	const url = `${API_BASE_URL}/sessions/${user.email}/end`;
+
+	// DELETE to /sessions/{user email} to leave the current session
+	console.log(`[POST] ${url}`);
+	fetch(url, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${IDToken}`
+		}
+	})
+		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+		.then((res) => {
+			if (res.status !== 200) throw Error(res.body.message);
+			dispatch({ type: LEAVE_SESSION });
+			if (navigation) navigation.navigate('Home');
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+		})
+		.catch((err) => {
+			ToastAndroid.show(err.toString(), ToastAndroid.LONG);
+			// set loading false
+			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
+		});
+}

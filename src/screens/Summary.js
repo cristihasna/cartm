@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ScreenHeading, ParticipantSummary, RoundButton } from '../components';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
@@ -28,6 +28,7 @@ class Summary extends Component {
     }
 
     componentWillReceiveProps(newProps){
+        if (!newProps.session) return;
         let state = this.state;
         for (let participant of newProps.session.participants){
             if (!state.hasOwnProperty(participant._id)) state[participant._id] = false;
@@ -35,6 +36,7 @@ class Summary extends Component {
         this.setState(state);
     }
 	render() {
+        if (!this.props.session) return null;
 		const participantsDict = {};
 		for (let participant of this.props.session.participants) {
 			participantsDict[participant.email] = normalizeUserData(participant.profile);
@@ -56,13 +58,11 @@ class Summary extends Component {
 				// user is participant of this product
 				let coParticipants = [];
 				for (let other of product.participants) {
-					// skip current user, as we will display just the co-participants
-					// if (other === participant.email) continue;
 					coParticipants.push(participantsDict[other]);
 				}
 				products.push(Object.assign(product, { coParticipants }));
-				participant.profile = participantsDict[participant.email];
 			}
+            participant.profile = participantsDict[participant.email];
 			participantsArray.push(
 				<ParticipantSummary
 					onToggle={this.handleToggle.bind(this)}
@@ -80,14 +80,14 @@ class Summary extends Component {
 						<Text style={styles.label}>Total: </Text>
 						<Text style={[ styles.accent, { fontSize: 28 } ]}>{total}</Text>
 					</View>
-					<Animated.ScrollView style={styles.participantsContainer}>
+					<ScrollView style={styles.participantsContainer}>
 						<View style={{ height: 25 }} />
 						{participantsArray}
 						<View style={{ height: 128 }} />
-					</Animated.ScrollView>
+					</ScrollView>
 				</View>
 				<View style={styles.productsButtonsWrapper}>
-					<RoundButton iconName="credit-card" onPress={() => console.warn('payment')} large />
+					<RoundButton iconName="credit-card" onPress={() => this.props.navigation.navigate('Payment')} large />
 				</View>
 			</View>
 		);
