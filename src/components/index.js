@@ -12,6 +12,7 @@ import Product from './Product';
 import UserList from './UserList';
 import ScreenHeading from './ScreenHeading';
 import User from './User';
+import ParticipantSummary from './ParticipantSummary';
 
 module.exports = {
     Logo,
@@ -27,5 +28,6 @@ module.exports = {
     ParticipantsList,
     UserList,
     ScreenHeading,
-    User
+    User,
+    ParticipantSummary
 }
