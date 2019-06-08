@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { MenuButton, User, ProfileSection, SpinningIcon } from '../components';
+import { MenuButton, User, ProfileSection, SpinningIcon, ProductCounter, HistoryProduct } from '../components';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { fetchDebts } from '../redux/actions/debtsActions';
@@ -15,14 +15,26 @@ class Profile extends Component {
 	}
 
 	render() {
+		// preconstructed elements
 		const preloader = (
 			<View style={styles.preloaderContainer}>
 				<SpinningIcon cycleTime={1000} name="circle-notch" style={styles.preloaderIcon} />
 			</View>
 		);
+
+		const noDetailsToShow = (
+			<View style={styles.noDataContainer}>
+				<Text style={styles.noDataText}>no details to show</Text>
+			</View>
+		);
+
+		// default values
 		let owedBy = 0;
 		let owedTo = 0;
 		let spentThisMonth = 0;
+
+		let popularProducts = [];
+		let latestProducts = [];
 
 		if (this.props.debts) {
 			owedBy = this.props.debts.owedBy.reduce((total, debt) => total + debt.amount, 0);
@@ -33,6 +45,16 @@ class Profile extends Component {
 				(total, product) => total + product.unitPrice * product.quantity / product.participants.length,
 				0 /*initial value*/
 			);
+		}
+		if (this.props.history.monthly.popular) {
+			popularProducts = this.props.history.monthly.popular.map((product) => (
+				<ProductCounter key={product._id} counter={product.counter} title={product.name} />
+			));
+		}
+		if (this.props.history.monthly.latest) {
+			latestProducts = this.props.history.monthly.latest.map((product) => (
+				<HistoryProduct key={product._id} title={product.product.name} productDate={product.date} />
+			));
 		}
 		const profileContent = (
 			<View style={styles.container}>
@@ -61,14 +83,15 @@ class Profile extends Component {
 							heading={{ title: 'Your most popular products' }}
 							buttonLabel="view more"
 							buttonAction={() => console.warn('view more popular products')}>
-							<Text>Hello</Text>
+							{popularProducts.length > 0 ? popularProducts : noDetailsToShow}
 						</ProfileSection>
-                        <ProfileSection
+						<ProfileSection
 							heading={{ title: 'History' }}
 							buttonLabel="view more"
 							buttonAction={() => console.warn('view more history')}>
-							<Text>Hello</Text>
+							{latestProducts.length > 0 ? latestProducts : noDetailsToShow}
 						</ProfileSection>
+						<View style={{ height: 20 }} />
 					</ScrollView>
 				</View>
 			</View>
@@ -120,7 +143,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between'
 	},
 	contentWrapper: {
-		padding: 20,
 		flex: 1
+	},
+	scrollView: {
+		paddingHorizontal: 20
 	}
 });
