@@ -14,9 +14,7 @@ export default class ProfileSection extends Component {
 						{h.right && <Text style={styles.right}>{h.right}</Text>}
 					</View>
 				))}
-                {this.props.children && 
-				    <View style={styles.contentContainer}>{this.props.children}</View>
-                }
+				{this.props.children && <View style={styles.contentContainer}>{this.props.children}</View>}
 				{this.props.buttonLabel && (
 					<TouchableOpacity onPress={this.props.buttonAction} style={styles.button}>
 						<Text style={styles.buttonLabel}>{this.props.buttonLabel}</Text>
@@ -55,23 +53,23 @@ const styles = StyleSheet.create({
 		fontSize: 26,
 		fontWeight: 'bold',
 		color: colors.purple
-    },
-    contentContainer: {
-        paddingLeft: 20,
-        marginLeft: 5,
-        marginTop: 5,
-        paddingVertical: 10,
-        borderLeftWidth: 2,
-        borderLeftColor: colors.purple
-    },
-    button: {
-        paddingVertical: 10,
-        alignItems: 'center'
-    },
-    buttonLabel: {
-        fontSize: 24,
-        color: colors.purple,
-        borderBottomWidth:1,
-        borderBottomColor: colors.purple
-    }
+	},
+	contentContainer: {
+		paddingLeft: 20,
+		marginLeft: 5,
+		marginTop: 5,
+		paddingVertical: 10,
+		borderLeftWidth: 2,
+		borderLeftColor: colors.purple
+	},
+	button: {
+		paddingVertical: 10,
+		alignItems: 'center'
+	},
+	buttonLabel: {
+		fontSize: 24,
+		color: colors.purple,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.purple
+	}
 });
