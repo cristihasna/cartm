@@ -13,7 +13,7 @@ export default function emailLogin(email, password) {
 				const loginData = normalize({
 					email: credentials.user.email,
 					displayName: credentials.user.displayName,
-					profileImg: credentials.user.photoURL
+					photoURL: credentials.user.photoURL
 				});
 				resolve(loginData);
 			})

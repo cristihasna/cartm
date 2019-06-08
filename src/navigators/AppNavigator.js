@@ -1,6 +1,6 @@
 import { createDrawerNavigator, createStackNavigator } from 'react-navigation';
 
-import { Home, CurrentSession, Summary, Payment } from '../screens';
+import { Home, CurrentSession, Summary, Payment, Profile } from '../screens';
 import { DrawerContent } from '../components';
 import colors from '../style/colors';
 
@@ -18,11 +18,23 @@ const SessionNavigator = createStackNavigator(
 	}
 );
 
+const ProfileNavigator = createStackNavigator(
+	{
+		Profile
+	},
+	{
+		defaultNavigationOptions: {
+			header: null
+		},
+		initialRouteName: 'Profile'
+	}
+)
 
 const AppNavigator = createDrawerNavigator(
 	{
 		Home,
-		SessionNavigator
+		SessionNavigator,
+		ProfileNavigator
 	},
 	{
 		defaultNavigationOptions:{

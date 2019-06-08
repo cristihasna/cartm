@@ -23,7 +23,7 @@ class Root extends Component {
 		let loginData = normalize({
 			email: data.email,
 			displayName: data.displayName,
-			profileImg: data.photoURL || null
+			photoURL: data.photoURL || null
 		});
 		this.props.loginUser(loginData);
 		this.props.fetchSession(this.props.navigation);

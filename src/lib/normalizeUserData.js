@@ -1,6 +1,6 @@
 const normalize = (data) => {
 	let loginData = data;
-	if (!loginData.profileImg) {
+	if (!loginData.photoURL) {
 		const emailID = data.email.split('@')[0];
 		const emailComponents = emailID.split(/[._]/, 2);
 		loginData.profileImgReplacement = emailComponents.map((item) => item.slice(0, 1)).join('').toUpperCase();
