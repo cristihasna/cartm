@@ -4,7 +4,7 @@ import { MenuButton, User, ProfileSection, SpinningIcon, ProductCounter, History
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { fetchDebts } from '../redux/actions/debtsActions';
-import { fetchPopularProducts, fetchExpensiveProducts, fetchLatestProducts } from '../redux/actions/historyActions';
+import {HistoryKind, fetchPopularProducts, fetchExpensiveProducts, fetchLatestProducts } from '../redux/actions/historyActions';
 
 class Profile extends Component {
 	constructor(props) {
@@ -13,16 +13,16 @@ class Profile extends Component {
 	}
 
 	_handleRefresh() {
-		this.props.fetchPopularProducts('monthly');
-		this.props.fetchLatestProducts('monthly');
-		this.props.fetchExpensiveProducts('monthly');
+		this.props.fetchPopularProducts(HistoryKind.MONTHLY);
+		this.props.fetchLatestProducts(HistoryKind.MONTHLY);
+		this.props.fetchExpensiveProducts(HistoryKind.MONTHLY);
 	}
 
 	componentDidMount() {
 		if (!this.props.debts) this.props.fetchDebts();
-		if (!this.props.history.monthly.popular) this.props.fetchPopularProducts('monthly');
-		if (!this.props.history.monthly.latest) this.props.fetchLatestProducts('monthly');
-		if (!this.props.history.monthly.expensive) this.props.fetchExpensiveProducts('monthly');
+		if (!this.props.history.monthly.popular) this.props.fetchPopularProducts(HistoryKind.MONTHLY);
+		if (!this.props.history.monthly.latest) this.props.fetchLatestProducts(HistoryKind.MONTHLY);
+		if (!this.props.history.monthly.expensive) this.props.fetchExpensiveProducts(HistoryKind.MONTHLY);
 	}
 
 	render() {
@@ -77,7 +77,10 @@ class Profile extends Component {
 					<MenuButton onPress={this.props.navigation.toggleDrawer} logo />
 				</View>
 				<View style={styles.contentWrapper}>
-					<ScrollView style={styles.scrollView} refreshControl={refreshControl} contentOffset={{x: 0, y: 20}}>
+					<ScrollView
+						style={styles.scrollView}
+						refreshControl={refreshControl}
+						contentOffset={{ x: 0, y: 20 }}>
 						<View style={styles.scrollViewWrapper}>
 							<View style={styles.userContainer}>
 								<User data={this.props.login} />
@@ -163,5 +166,13 @@ const styles = StyleSheet.create({
 	},
 	scrollViewWrapper: {
 		paddingHorizontal: 20
+	},
+	noDataContainer: {
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	noDataText: {
+		color: colors.purple,
+		fontStyle: 'italic'
 	}
 });
