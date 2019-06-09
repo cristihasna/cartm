@@ -5,7 +5,7 @@ import { MenuButton, User, ProfileSection } from '../components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
-import { fetchDebts } from '../redux/actions/debtsActions';
+import { fetchDebts, setDebtDeadline, setDebtPayed } from '../redux/actions/debtsActions';
 import { normalizeUserData } from '../lib';
 
 class Debt extends Component {
@@ -17,14 +17,19 @@ class Debt extends Component {
 		};
 	}
 
-	_handlePayButton() {
+	handlePayed() {
 		this.swipeable.close();
 		Animated.timing(this.state.marginBottom, {
 			toValue: -56,
 			duration: 200
 		}).start();
 		this.setState({ opacity: 0 });
-		this.props.onRemove(this.props.product);
+		this.props.onPay();
+	}
+
+	handleSetDeadline() {
+		this.swipeable.close();
+		this.props.onSetDeadline();
 	}
 
 	renderPayButton(_, dragX) {
@@ -35,9 +40,24 @@ class Debt extends Component {
 		});
 		return (
 			<Animated.View style={{ transform: [ { scale } ] }}>
-				<TouchableOpacity style={styles.payButton}>
+				<TouchableOpacity style={styles.payButton} onPress={this.handlePayed.bind(this)}>
 					<Icon name="check" style={styles.payIcon} />
 				</TouchableOpacity>
+			</Animated.View>
+		);
+	}
+
+	renderDeadlineButton(_, dragX) {
+		const scale = dragX.interpolate({
+			inputRange: [ 0, 50 ],
+			outputRange: [ 0, 1 ],
+			extrapolate: 'clamp'
+		});
+		return (
+			<Animated.View style={{ transform: [ { scale } ] }}>
+				<View style={styles.payButton}>
+					<Icon name="calendar-day" style={styles.payIcon} />
+				</View>
 			</Animated.View>
 		);
 	}
@@ -58,17 +78,31 @@ class Debt extends Component {
 				containerStyle={{ marginBottom: this.state.marginBottom, opacity: this.state.opacity }}
 				ref={(ref) => (this.swipeable = ref)}
 				friction={2}
+				onSwipeableLeftOpen={this.handleSetDeadline.bind(this)}
 				renderRightActions={this.renderPayButton.bind(this)}
-				leftThreshold={50}>
+				renderLeftActions={this.renderDeadlineButton.bind(this)}
+				leftThreshold={50}
+				rightThreshold={50}>
 				{debtContent}
 			</Swipeable>
-		) : debtContent;
+		) : (
+			debtContent
+		);
 	}
 }
 
 class Debts extends Component {
 	_handleRefresh() {
 		this.props.fetchDebts();
+	}
+
+	handlePayed(debt) {
+		this.props.setDebtPayed(debt);
+		this.props.fetchDebts();
+	}
+
+	handleSetDeadline(debt) {
+		console.log('new deadline', debt);
 	}
 
 	componentDidMount() {
@@ -95,14 +129,19 @@ class Debts extends Component {
 		let owedToDebts = [];
 
 		if (this.props.debts) {
-			console.log(this.props.debts);
 			owedBy = this.props.debts.owedBy.reduce((total, debt) => total + debt.amount, 0);
 			owedTo = this.props.debts.owedTo.reduce((total, debt) => total + debt.amount, 0);
 			owedByDebts = this.props.debts.owedBy.map((debt) => (
 				<Debt key={debt._id} debt={debt.amount} user={normalizeUserData(debt.owedTo)} />
 			));
 			owedToDebts = this.props.debts.owedTo.map((debt) => (
-				<Debt key={debt._id} debt={debt.amount} user={normalizeUserData(debt.owedBy)} onPay />
+				<Debt
+					key={debt._id}
+					debt={debt.amount}
+					user={normalizeUserData(debt.owedBy)}
+					onPay={() => this.handlePayed(debt)}
+					onSetDeadline={() => this.handleSetDeadline(debt)}
+				/>
 			));
 		}
 
@@ -122,7 +161,7 @@ class Debts extends Component {
 							{owedByDebts.length > 0 ? owedByDebts : noDetailsToShow}
 							<ProfileSection heading={{ title: 'You are owed:', right: owedTo.toFixed(2) }} />
 							{owedToDebts.length > 0 ? owedToDebts : noDetailsToShow}
-							<View style={{height: 20}} />
+							<View style={{ height: 20 }} />
 						</View>
 					</ScrollView>
 				</View>
@@ -139,7 +178,9 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {
-	fetchDebts
+	fetchDebts,
+	setDebtDeadline,
+	setDebtPayed
 })(Debts);
 
 const styles = StyleSheet.create({
@@ -174,9 +215,9 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		paddingHorizontal: 10,
-		paddingVertical: 5,
+		height: 50,
 		backgroundColor: colors.mediumGrey,
-		marginVertical: 2,
+		marginVertical: 3,
 		alignItems: 'center'
 	},
 	debtAmount: {
@@ -188,7 +229,7 @@ const styles = StyleSheet.create({
 		height: 50,
 		width: 50,
 		justifyContent: 'center',
-		alignItems: 'flex-end'
+		alignItems: 'center'
 	},
 	payIcon: {
 		fontSize: 24,
