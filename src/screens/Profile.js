@@ -7,12 +7,8 @@ import { fetchDebts } from '../redux/actions/debtsActions';
 import {HistoryKind, fetchPopularProducts, fetchExpensiveProducts, fetchLatestProducts } from '../redux/actions/historyActions';
 
 class Profile extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { refresing: false };
-	}
-
 	_handleRefresh() {
+		this.props.fetchDebts();
 		this.props.fetchPopularProducts(HistoryKind.MONTHLY);
 		this.props.fetchLatestProducts(HistoryKind.MONTHLY);
 		this.props.fetchExpensiveProducts(HistoryKind.MONTHLY);
@@ -91,7 +87,7 @@ class Profile extends Component {
 									{ title: 'You are owed:', right: owedTo.toFixed(2) }
 								]}
 								buttonLabel="more details"
-								buttonAction={() => console.warn('debts')}
+								buttonAction={() => this.props.navigation.navigate('Debts')}
 							/>
 							<ProfileSection
 								heading={{ title: 'Total spent this month:', right: spentThisMonth.toFixed(2) }}
@@ -116,7 +112,6 @@ class Profile extends Component {
 			</View>
 		);
 
-		// if (this.props.loading) return preloader;
 		return profileContent;
 	}
 }
