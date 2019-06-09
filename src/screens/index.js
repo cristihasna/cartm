@@ -5,6 +5,7 @@ import CurrentSession from './CurrentSession';
 import Root from './Root';
 import Summary from './Summary';
 import Payment from './Payment';
+import Profile from './Profile';
 
 module.exports = {
 	Login,
@@ -13,5 +14,6 @@ module.exports = {
 	CurrentSession,
 	Root,
 	Summary,
-	Payment
+	Payment,
+	Profile
 };

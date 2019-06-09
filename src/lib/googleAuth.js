@@ -11,7 +11,6 @@ export default function googleLogin() {
 		//request idToken and accessToken from Google
 		GoogleSignin.signIn()
 			.then((data) => {
-				console.log('intra');
 				//obtain credential frin firebase using idToken and accessToken from Google
 				const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken);
 
@@ -23,7 +22,7 @@ export default function googleLogin() {
 						const loginData = normalize({
 							email: credentials.user.email,
 							displayName: credentials.user.displayName,
-							profileImg: credentials.user.photoURL
+							photoURL: credentials.user.photoURL
 						});
 						resolve(loginData);
 					})

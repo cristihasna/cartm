@@ -32,8 +32,8 @@ class DrawerContent extends Component {
 			<ScrollView style={styles.container}>
 				{login && <View style={[ styles.profileContainer, styles.separatorAfter ]}>
 					<View style={styles.profileImgContainer}>
-						{login.profileImg ? (
-							<Image style={styles.profileImg} source={{ uri: login.profileImg }} />
+						{login.photoURL ? (
+							<Image style={styles.profileImg} source={{ uri: login.photoURL }} />
 						) : (
 							<Text style={styles.profileImgReplacement}>{login.profileImgReplacement}</Text>
 						)}
@@ -65,7 +65,7 @@ class DrawerContent extends Component {
 				<DrawerItem
 					label={'View profile'}
 					iconName={'user'}
-					onPress={() => console.warn('navigate to profile')}
+					onPress={() => navigation.navigate('Profile')}
 				/>
 				<DrawerItem
 					label={'Log out'}

@@ -14,6 +14,9 @@ import ScreenHeading from './ScreenHeading';
 import User from './User';
 import ParticipantSummary from './ParticipantSummary';
 import ParticipantPayment from './ParticipantPayment';
+import ProfileSection from './ProfileSection';
+import ProductCounter from './ProductCounter';
+import HistoryProduct from './HistoryProduct';
 
 module.exports = {
 	Logo,
@@ -31,5 +34,8 @@ module.exports = {
 	ScreenHeading,
 	User,
 	ParticipantSummary,
-	ParticipantPayment
+	ParticipantPayment,
+	ProfileSection,
+	ProductCounter,
+	HistoryProduct
 };
