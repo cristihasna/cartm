@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { MenuButton, User, ProfileSection, SpinningIcon, ProductCounter, HistoryProduct } from '../components';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
@@ -7,6 +7,17 @@ import { fetchDebts } from '../redux/actions/debtsActions';
 import { fetchPopularProducts, fetchExpensiveProducts, fetchLatestProducts } from '../redux/actions/historyActions';
 
 class Profile extends Component {
+	constructor(props) {
+		super(props);
+		this.state = { refresing: false };
+	}
+
+	_handleRefresh() {
+		this.props.fetchPopularProducts('monthly');
+		this.props.fetchLatestProducts('monthly');
+		this.props.fetchExpensiveProducts('monthly');
+	}
+
 	componentDidMount() {
 		if (!this.props.debts) this.props.fetchDebts();
 		if (!this.props.history.monthly.popular) this.props.fetchPopularProducts('monthly');
@@ -20,6 +31,10 @@ class Profile extends Component {
 			<View style={styles.preloaderContainer}>
 				<SpinningIcon cycleTime={1000} name="circle-notch" style={styles.preloaderIcon} />
 			</View>
+		);
+		// refresh control component
+		const refreshControl = (
+			<RefreshControl refreshing={this.props.loading} onRefresh={this._handleRefresh.bind(this)} />
 		);
 
 		const noDetailsToShow = (
@@ -62,42 +77,43 @@ class Profile extends Component {
 					<MenuButton onPress={this.props.navigation.toggleDrawer} logo />
 				</View>
 				<View style={styles.contentWrapper}>
-					<ScrollView style={styles.scrollView}>
-						<View style={styles.userContainer}>
-							<User data={this.props.login} />
+					<ScrollView style={styles.scrollView} refreshControl={refreshControl} contentOffset={{x: 0, y: 20}}>
+						<View style={styles.scrollViewWrapper}>
+							<View style={styles.userContainer}>
+								<User data={this.props.login} />
+							</View>
+							<ProfileSection
+								heading={[
+									{ title: 'You owe:', right: owedBy.toFixed(2) },
+									{ title: 'You are owed:', right: owedTo.toFixed(2) }
+								]}
+								buttonLabel="more details"
+								buttonAction={() => console.warn('debts')}
+							/>
+							<ProfileSection
+								heading={{ title: 'Total spent this month:', right: spentThisMonth.toFixed(2) }}
+								buttonLabel="view expenses"
+								buttonAction={() => console.warn('expenses')}
+							/>
+							<ProfileSection
+								heading={{ title: 'Your most popular products' }}
+								buttonLabel="view more"
+								buttonAction={() => console.warn('view more popular products')}>
+								{popularProducts.length > 0 ? popularProducts : noDetailsToShow}
+							</ProfileSection>
+							<ProfileSection
+								heading={{ title: 'History' }}
+								buttonLabel="view more"
+								buttonAction={() => console.warn('view more history')}>
+								{latestProducts.length > 0 ? latestProducts : noDetailsToShow}
+							</ProfileSection>
 						</View>
-						<ProfileSection
-							heading={[
-								{ title: 'You owe:', right: owedBy.toFixed(2) },
-								{ title: 'You are owed:', right: owedTo.toFixed(2) }
-							]}
-							buttonLabel="more details"
-							buttonAction={() => console.warn('debts')}
-						/>
-						<ProfileSection
-							heading={{ title: 'Total spent this month:', right: spentThisMonth.toFixed(2) }}
-							buttonLabel="view expenses"
-							buttonAction={() => console.warn('expenses')}
-						/>
-						<ProfileSection
-							heading={{ title: 'Your most popular products' }}
-							buttonLabel="view more"
-							buttonAction={() => console.warn('view more popular products')}>
-							{popularProducts.length > 0 ? popularProducts : noDetailsToShow}
-						</ProfileSection>
-						<ProfileSection
-							heading={{ title: 'History' }}
-							buttonLabel="view more"
-							buttonAction={() => console.warn('view more history')}>
-							{latestProducts.length > 0 ? latestProducts : noDetailsToShow}
-						</ProfileSection>
-						<View style={{ height: 20 }} />
 					</ScrollView>
 				</View>
 			</View>
 		);
 
-		if (this.props.loading) return preloader;
+		// if (this.props.loading) return preloader;
 		return profileContent;
 	}
 }
@@ -145,7 +161,7 @@ const styles = StyleSheet.create({
 	contentWrapper: {
 		flex: 1
 	},
-	scrollView: {
+	scrollViewWrapper: {
 		paddingHorizontal: 20
 	}
 });
