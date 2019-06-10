@@ -4,7 +4,12 @@ import { MenuButton, User, ProfileSection, SpinningIcon, ProductCounter, History
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { fetchDebts } from '../redux/actions/debtsActions';
-import {HistoryKind, fetchPopularProducts, fetchExpensiveProducts, fetchLatestProducts } from '../redux/actions/historyActions';
+import {
+	HistoryKind,
+	fetchPopularProducts,
+	fetchExpensiveProducts,
+	fetchLatestProducts
+} from '../redux/actions/historyActions';
 
 class Profile extends Component {
 	_handleRefresh() {
@@ -22,12 +27,6 @@ class Profile extends Component {
 	}
 
 	render() {
-		// preconstructed elements
-		const preloader = (
-			<View style={styles.preloaderContainer}>
-				<SpinningIcon cycleTime={1000} name="circle-notch" style={styles.preloaderIcon} />
-			</View>
-		);
 		// refresh control component
 		const refreshControl = (
 			<RefreshControl refreshing={this.props.loading} onRefresh={this._handleRefresh.bind(this)} />
@@ -79,7 +78,7 @@ class Profile extends Component {
 						contentOffset={{ x: 0, y: 20 }}>
 						<View style={styles.scrollViewWrapper}>
 							<View style={styles.userContainer}>
-								<User data={this.props.login} />
+								{this.props.login && <User data={this.props.login} />}
 							</View>
 							<ProfileSection
 								heading={[

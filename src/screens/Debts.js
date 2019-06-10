@@ -149,7 +149,9 @@ class Debts extends Component {
 			<View style={styles.container}>
 				<View style={styles.headerContainer}>
 					<MenuButton onPress={this.props.navigation.toggleDrawer} logo />
-					<User data={this.props.login} containerStyle={{ flex: 0, transform: [ { scale: 0.75 } ] }} />
+					{this.props.login && (
+						<User data={this.props.login} containerStyle={{ flex: 0, transform: [ { scale: 0.75 } ] }} />
+					)}
 				</View>
 				<View style={styles.contentWrapper}>
 					<ScrollView
