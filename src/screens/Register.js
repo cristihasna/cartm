@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, TouchableOpacity, ToastAndroid } from 'react-native';
-import { Logo, HorizontalSeparator, CredentialInput } from '../components';
-import { emailRegister } from '../lib';
+import { Logo, HorizontalSeparator, CredentialInput, SpinningIcon } from '../components';
+import { emailRegister, emailLogin } from '../lib';
+import { connect } from 'react-redux';
+import { loginUser } from '../redux/actions/loginActions';
 import colors from '../style/colors';
 
-export default class Register extends Component {
+class Register extends Component {
 	static navigationOptions = {
 		title: 'Register',
 		headerStyle: {
@@ -55,16 +57,21 @@ export default class Register extends Component {
 			this.setState({ highlighted });
 			return;
 		}
-
+		this.setState({ loading: true });
 		emailRegister(email, password)
-			.then((data) => this.props.navigation.navigate('Home'))
+			.then(async () => {
+				const data = await emailLogin(email, password);
+				this.props.loginUser(data);
+				this.setState({ loading: false });
+				this.props.navigation.navigate('Home');
+			})
 			.catch((err) => {
 				const showMessage = true;
 				let message = '';
 				if (err.code === 'auth/email-already-in-use') {
 					highlighted.email = true;
 					message = 'This email is already in use. Log in with your password in the login screen.';
-				} else if (err.code === 'auth/auth/invalid-email') {
+				} else if (err.code === 'auth/invalid-email') {
 					highlighted.email = true;
 					message = 'Please check the email, it appears to be invalid';
 				} else if (err.code === 'auth/weak-password') {
@@ -75,11 +82,17 @@ export default class Register extends Component {
 				this.passField.value = '';
 				this.confirmPassField.value = '';
 
-				this.setState({ showMessage, message, highlighted });
+				this.setState({ showMessage, message, highlighted, loading: false });
 			});
 	}
 
 	render() {
+		if (this.state.loading)
+			return (
+				<View style={styles.preloaderContainer}>
+					<SpinningIcon cycleTime={1000} name="circle-notch" style={styles.preloaderIcon} />
+				</View>
+			);
 		return (
 			<View style={styles.container}>
 				<KeyboardAvoidingView style={styles.wrapper} enabled>
@@ -145,7 +158,21 @@ export default class Register extends Component {
 	}
 }
 
+export default connect(null, { loginUser })(Register);
+
 const styles = StyleSheet.create({
+	preloaderContainer: {
+		flex: 1,
+		width: 100 + '%',
+		height: 100 + '%',
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: colors.lightGrey
+	},
+	preloaderIcon: {
+		fontSize: 64,
+		color: colors.purple
+	},
 	container: {
 		width: 100 + '%',
 		height: 100 + '%',

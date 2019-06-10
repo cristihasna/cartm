@@ -4,34 +4,29 @@ import { MenuButton, User, ProfileSection, SpinningIcon, ProductCounter, History
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { fetchDebts } from '../redux/actions/debtsActions';
-import { fetchPopularProducts, fetchExpensiveProducts, fetchLatestProducts } from '../redux/actions/historyActions';
+import {
+	HistoryKind,
+	fetchPopularProducts,
+	fetchExpensiveProducts,
+	fetchLatestProducts
+} from '../redux/actions/historyActions';
 
 class Profile extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { refresing: false };
-	}
-
 	_handleRefresh() {
-		this.props.fetchPopularProducts('monthly');
-		this.props.fetchLatestProducts('monthly');
-		this.props.fetchExpensiveProducts('monthly');
+		this.props.fetchDebts();
+		this.props.fetchPopularProducts(HistoryKind.MONTHLY);
+		this.props.fetchLatestProducts(HistoryKind.MONTHLY);
+		this.props.fetchExpensiveProducts(HistoryKind.MONTHLY);
 	}
 
 	componentDidMount() {
 		if (!this.props.debts) this.props.fetchDebts();
-		if (!this.props.history.monthly.popular) this.props.fetchPopularProducts('monthly');
-		if (!this.props.history.monthly.latest) this.props.fetchLatestProducts('monthly');
-		if (!this.props.history.monthly.expensive) this.props.fetchExpensiveProducts('monthly');
+		if (!this.props.history.monthly.popular) this.props.fetchPopularProducts(HistoryKind.MONTHLY);
+		if (!this.props.history.monthly.latest) this.props.fetchLatestProducts(HistoryKind.MONTHLY);
+		if (!this.props.history.monthly.expensive) this.props.fetchExpensiveProducts(HistoryKind.MONTHLY);
 	}
 
 	render() {
-		// preconstructed elements
-		const preloader = (
-			<View style={styles.preloaderContainer}>
-				<SpinningIcon cycleTime={1000} name="circle-notch" style={styles.preloaderIcon} />
-			</View>
-		);
 		// refresh control component
 		const refreshControl = (
 			<RefreshControl refreshing={this.props.loading} onRefresh={this._handleRefresh.bind(this)} />
@@ -77,10 +72,13 @@ class Profile extends Component {
 					<MenuButton onPress={this.props.navigation.toggleDrawer} logo />
 				</View>
 				<View style={styles.contentWrapper}>
-					<ScrollView style={styles.scrollView} refreshControl={refreshControl} contentOffset={{x: 0, y: 20}}>
+					<ScrollView
+						style={styles.scrollView}
+						refreshControl={refreshControl}
+						contentOffset={{ x: 0, y: 20 }}>
 						<View style={styles.scrollViewWrapper}>
 							<View style={styles.userContainer}>
-								<User data={this.props.login} />
+								{this.props.login && <User data={this.props.login} />}
 							</View>
 							<ProfileSection
 								heading={[
@@ -88,7 +86,7 @@ class Profile extends Component {
 									{ title: 'You are owed:', right: owedTo.toFixed(2) }
 								]}
 								buttonLabel="more details"
-								buttonAction={() => console.warn('debts')}
+								buttonAction={() => this.props.navigation.navigate('Debts')}
 							/>
 							<ProfileSection
 								heading={{ title: 'Total spent this month:', right: spentThisMonth.toFixed(2) }}
@@ -113,7 +111,6 @@ class Profile extends Component {
 			</View>
 		);
 
-		// if (this.props.loading) return preloader;
 		return profileContent;
 	}
 }
@@ -163,5 +160,13 @@ const styles = StyleSheet.create({
 	},
 	scrollViewWrapper: {
 		paddingHorizontal: 20
+	},
+	noDataContainer: {
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	noDataText: {
+		color: colors.purple,
+		fontStyle: 'italic'
 	}
 });

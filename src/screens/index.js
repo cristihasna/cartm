@@ -6,6 +6,7 @@ import Root from './Root';
 import Summary from './Summary';
 import Payment from './Payment';
 import Profile from './Profile';
+import Debts from './Debts';
 
 module.exports = {
 	Login,
@@ -15,5 +16,6 @@ module.exports = {
 	Root,
 	Summary,
 	Payment,
-	Profile
+	Profile,
+	Debts
 };

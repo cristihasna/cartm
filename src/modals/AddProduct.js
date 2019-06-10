@@ -85,7 +85,7 @@ export default class AddProductModal extends Component {
 		fetchOpenFoodFactsAPI(barcode)
 			.then(async (data) => {
 				let currentState = this.state;
-				if (data) {
+				if (data && data.name) {
 					currentState.openFoodFactsData = data;
 					currentState.name = data.name;
 					currentState.showCamera = false;

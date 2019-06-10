@@ -2,20 +2,18 @@ import React from 'react';
 import { View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
 import colors from '../style/colors';
 
-export default ({ onPress, data }) => {
+export default ({ onPress, data, containerStyle, iconStyle, textStyle }) => {
 	const UserContainer = onPress ? TouchableOpacity : View;
 	return (
-		<UserContainer
-			onPress={onPress}
-			style={styles.container}>
-			<View style={styles.profileImgContainer}>
+		<UserContainer onPress={onPress} style={[ styles.container, containerStyle ]}>
+			<View style={[ styles.profileImgContainer, iconStyle ]}>
 				{data.photoURL ? (
 					<Image style={styles.profileImg} source={{ uri: data.photoURL }} />
 				) : (
 					<Text style={styles.profileImgReplacement}>{data.profileImgReplacement}</Text>
 				)}
 			</View>
-			<Text style={styles.displayName}>{data.displayName}</Text>
+			<Text style={[ styles.displayName, textStyle ]}>{data.displayName}</Text>
 		</UserContainer>
 	);
 };
