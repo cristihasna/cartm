@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Animated } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { MenuButton, User, ProfileSection } from '../components';
+import { ScreenHeading, User, ProfileSection } from '../components';
+import { DebtDeadlineManager } from '../modals';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
@@ -56,7 +57,7 @@ class Debt extends Component {
 		return (
 			<Animated.View style={{ transform: [ { scale } ] }}>
 				<View style={styles.payButton}>
-					<Icon name="calendar-day" style={styles.payIcon} />
+					<Icon name="user-clock" style={styles.payIcon} />
 				</View>
 			</Animated.View>
 		);
@@ -101,8 +102,10 @@ class Debts extends Component {
 		this.props.fetchDebts();
 	}
 
-	handleSetDeadline(debt) {
-		console.log('new deadline', debt);
+	handleSetDeadline(debt, deadline) {
+		this.debtManager.hide();
+		this.props.setDebtDeadline(debt, deadline);
+		this.props.fetchDebts();
 	}
 
 	componentDidMount() {
@@ -140,7 +143,7 @@ class Debts extends Component {
 					debt={debt.amount}
 					user={normalizeUserData(debt.owedBy)}
 					onPay={() => this.handlePayed(debt)}
-					onSetDeadline={() => this.handleSetDeadline(debt)}
+					onSetDeadline={() => this.debtManager.show(debt)}
 				/>
 			));
 		}
@@ -148,7 +151,7 @@ class Debts extends Component {
 		const debtsContent = (
 			<View style={styles.container}>
 				<View style={styles.headerContainer}>
-					<MenuButton onPress={this.props.navigation.toggleDrawer} logo />
+					<ScreenHeading title={'Back to profile'} action={() => this.props.navigation.goBack()} />
 					{this.props.login && (
 						<User data={this.props.login} containerStyle={{ flex: 0, transform: [ { scale: 0.75 } ] }} />
 					)}
@@ -167,6 +170,10 @@ class Debts extends Component {
 						</View>
 					</ScrollView>
 				</View>
+				<DebtDeadlineManager
+					ref={(ref) => (this.debtManager = ref)}
+					onSetDeadline={this.handleSetDeadline.bind(this)}
+				/>
 			</View>
 		);
 		return debtsContent;
