@@ -91,7 +91,7 @@ class Profile extends Component {
 							<ProfileSection
 								heading={{ title: 'Total spent this month:', right: spentThisMonth.toFixed(2) }}
 								buttonLabel="view expenses"
-								buttonAction={() => console.warn('expenses')}
+								buttonAction={() => this.props.navigation.navigate('Expenses')}
 							/>
 							<ProfileSection
 								heading={{ title: 'Your most popular products' }}
