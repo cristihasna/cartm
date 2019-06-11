@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import DatePicker from 'react-native-datepicker';
-import { fetchExpensiveProducts, updateHistoryBoundings, HistoryKind } from '../redux/actions/historyActions';
+import { fetchLatestProducts, updateHistoryBoundings, HistoryKind } from '../redux/actions/historyActions';
 
 const HistoryDate = ({ date, onChange }) => (
 	<View style={styles.datepickerContainer}>
@@ -66,26 +66,26 @@ class Expenses extends Component {
 	_handleRefresh() {
 		const beginDate = this.props.history.beginDate;
 		const endDate = this.props.history.endDate;
-		this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+		this.props.fetchLatestProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
 	}
 
 	_handleBeginDateUpdate(beginDate) {
 		const endDate = this.props.history.endDate;
 		this.props.updateHistoryBoundings({ beginDate: new Date(beginDate), endDate });
-		this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+		this.props.fetchLatestProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
 	}
 
 	_handleEndDateUpdate(endDate) {
 		const beginDate = this.props.history.beginDate;
 		this.props.updateHistoryBoundings({ beginDate, endDate });
-		this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+		this.props.fetchLatestProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
 	}
 
 	componentDidMount() {
 		const beginDate = this.props.history.beginDate;
 		const endDate = this.props.history.endDate;
-		if (!this.props.history.custom.expensive)
-			this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+		if (!this.props.history.custom.latest)
+			this.props.fetchLatestProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
 	}
 
 	render() {
@@ -101,14 +101,9 @@ class Expenses extends Component {
 		);
 
 		// default values
-		let totalExpenses = 0;
-		let expensiveProducts = [];
-		if (this.props.history.custom.expensive) {
-			expensiveProducts = this.props.history.custom.expensive;
-			totalExpenses = expensiveProducts.reduce(
-				(total, product) => total + product.unitPrice * product.quantity / product.participants.length,
-				0 /*initial value*/
-			);
+		let latestProducts = [];
+		if (this.props.history.custom.latest) {
+			latestProducts = this.props.history.custom.latest;
 		}
 
 		const debtsContent = (
@@ -120,7 +115,6 @@ class Expenses extends Component {
 					)}
 				</View>
 				<View style={styles.contentWrapper}>
-					<ProfileSection heading={{ title: 'Expenses:', right: totalExpenses.toFixed(2) }} />
 					<View style={styles.datePickersContainer}>
 						<HistoryDate
 							date={this.props.history.beginDate}
@@ -133,13 +127,13 @@ class Expenses extends Component {
 						/>
 					</View>
 					<View style={styles.graphContainer}>
-						<Graph products={expensiveProducts} />
+						<Graph products={latestProducts} />
 					</View>
-					<ProfileSection heading={{ title: 'Most expensive products' }} containerStyle={{ flex: 1 }}>
-						{expensiveProducts.length > 0 ? (
+					<ProfileSection heading={{ title: 'Latest products' }} containerStyle={{ flex: 1 }}>
+						{latestProducts.length > 0 ? (
 							<FlatList
 								refreshControl={refreshControl}
-								data={expensiveProducts}
+								data={latestProducts}
 								keyExtractor={(product) => product._id}
 								renderItem={({ item }) => {
 									return <Product product={item} />;
@@ -163,7 +157,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {
-	fetchExpensiveProducts,
+	fetchLatestProducts,
 	updateHistoryBoundings
 })(Expenses);
 
