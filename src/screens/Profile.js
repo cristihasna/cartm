@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { MenuButton, User, ProfileSection, SpinningIcon, ProductCounter, HistoryProduct } from '../components';
+import { MenuButton, User, ProfileSection, ProductCounter, HistoryProduct } from '../components';
+import { PROFILE_HISTORY_LIMIT } from 'react-native-dotenv';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import { fetchDebts } from '../redux/actions/debtsActions';
@@ -57,14 +58,16 @@ class Profile extends Component {
 			);
 		}
 		if (this.props.history.monthly.popular) {
-			popularProducts = this.props.history.monthly.popular.map((product) => (
-				<ProductCounter key={product._id} counter={product.counter} title={product.name} />
-			));
+			popularProducts = this.props.history.monthly.popular
+				.slice(0, PROFILE_HISTORY_LIMIT)
+				.map((product) => <ProductCounter key={product._id} counter={product.counter} title={product.name} />);
 		}
 		if (this.props.history.monthly.latest) {
-			latestProducts = this.props.history.monthly.latest.map((product) => (
-				<HistoryProduct key={product._id} title={product.product.name} productDate={product.date} />
-			));
+			latestProducts = this.props.history.monthly.latest
+				.slice(0, PROFILE_HISTORY_LIMIT)
+				.map((product) => (
+					<HistoryProduct key={product._id} title={product.product.name} productDate={product.date} />
+				));
 		}
 		const profileContent = (
 			<View style={styles.container}>
@@ -91,7 +94,7 @@ class Profile extends Component {
 							<ProfileSection
 								heading={{ title: 'Total spent this month:', right: spentThisMonth.toFixed(2) }}
 								buttonLabel="view expenses"
-								buttonAction={() => console.warn('expenses')}
+								buttonAction={() => this.props.navigation.navigate('Expenses')}
 							/>
 							<ProfileSection
 								heading={{ title: 'Your most popular products' }}

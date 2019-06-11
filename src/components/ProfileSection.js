@@ -7,14 +7,16 @@ export default class ProfileSection extends Component {
 	render() {
 		const heading = Array.isArray(this.props.heading) ? this.props.heading : [ this.props.heading ];
 		return (
-			<View style={styles.container}>
+			<View style={[ styles.container, this.props.containerStyle ]}>
 				{heading.map((h) => (
 					<View key={h.title} style={styles.headerContainer}>
 						<Text style={styles.title}>{h.title}</Text>
 						{h.right && <Text style={styles.right}>{h.right}</Text>}
 					</View>
 				))}
-				{this.props.children && <View style={styles.contentContainer}>{this.props.children}</View>}
+				{this.props.children && (
+					<View style={[ styles.contentContainer, this.props.childrenStyle ]}>{this.props.children}</View>
+				)}
 				{this.props.buttonLabel && (
 					<TouchableOpacity onPress={this.props.buttonAction} style={styles.button}>
 						<Text style={styles.buttonLabel}>{this.props.buttonLabel}</Text>

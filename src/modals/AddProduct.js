@@ -157,6 +157,7 @@ export default class AddProductModal extends Component {
 			visible: true,
 			price: undefined,
 			name: undefined,
+			barcode: undefined,
 			quantity: '1',
 			openFoodFactsData: undefined,
 			loading: false,

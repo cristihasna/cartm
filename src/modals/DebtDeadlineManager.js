@@ -16,14 +16,15 @@ const DatePickerButton = ({ iconName, onAction, disabled, style }) => (
 );
 
 const Product = ({ product }) => {
-	const description = `(${product.unitPrice.toFixed(2)} / ${product.participants.length} participants)`;
+	const price = product.unitPrice * product.quantity;
+	const description = `(${price.toFixed(2)} / ${product.participants.length} participants)`;
 	let name = product.product.name;
 	if (name.length > 30) name = name.slice(0, 25) + '...' + name.slice(name.length - 3);
 	return (
 		<View style={styles.productContainer}>
 			<View style={styles.productTop}>
 				<Text style={styles.productName}>{name}</Text>
-				<Text style={styles.productPrice}>{(product.unitPrice / product.participants.length).toFixed(2)}</Text>
+				<Text style={styles.productPrice}>{(price / product.participants.length).toFixed(2)}</Text>
 			</View>
 			<View style={styles.productRight}>
 				{product.participants.length > 1 && <Text style={styles.productDesc}>{description}</Text>}

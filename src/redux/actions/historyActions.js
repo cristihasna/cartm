@@ -16,9 +16,9 @@ export const fetchPopularProducts = (kind, limit, beginDate, endDate) => async (
 		beginDate = new Date(now.getFullYear(), now.getMonth());
 		endDate = new Date();
 	}
-
+	const queryLimit = kind === HistoryKind.MONTHLY ? (limit || PROFILE_HISTORY_LIMIT || 3) : limit;
 	try {
-		const products = await fetchHistory('popular', limit || PROFILE_HISTORY_LIMIT || 3, beginDate, endDate);
+		const products = await fetchHistory('popular', limit, beginDate, endDate);
 		dispatch({ type: UPDATE_HISTORY_PRODUCTS, products: { popular: products }, kind });
 	} catch (err) {
 		ToastAndroid.show(err.toString(), ToastAndroid.LONG);
@@ -36,9 +36,9 @@ export const fetchExpensiveProducts = (kind, limit, beginDate, endDate) => async
 		beginDate = new Date(now.getFullYear(), now.getMonth());
 		endDate = new Date();
 	}
-
+	const queryLimit = kind === HistoryKind.MONTHLY ? (limit || PROFILE_HISTORY_LIMIT || 3) : limit;
 	try {
-		const products = await fetchHistory('price', limit || PROFILE_HISTORY_LIMIT || 3, beginDate, endDate);
+		const products = await fetchHistory('price', limit, beginDate, endDate);
 		dispatch({ type: UPDATE_HISTORY_PRODUCTS, products: { expensive: products }, kind });
 	} catch (err) {
 		ToastAndroid.show(err.toString(), ToastAndroid.LONG);
@@ -56,9 +56,9 @@ export const fetchLatestProducts = (kind, limit, beginDate, endDate) => async (d
 		beginDate = new Date(now.getFullYear(), now.getMonth());
 		endDate = new Date();
 	}
-
+	const queryLimit = kind === HistoryKind.MONTHLY ? (limit || PROFILE_HISTORY_LIMIT || 3) : limit;
 	try {
-		const products = await fetchHistory('date', limit || PROFILE_HISTORY_LIMIT || 3, beginDate, endDate);
+		const products = await fetchHistory('date', limit, beginDate, endDate);
 		dispatch({ type: UPDATE_HISTORY_PRODUCTS, products: { latest: products }, kind });
 	} catch (err) {
 		ToastAndroid.show(err.toString(), ToastAndroid.LONG);

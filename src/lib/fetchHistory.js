@@ -2,7 +2,6 @@ import { API_BASE_URL } from 'react-native-dotenv';
 import firebase from 'react-native-firebase';
 
 export default async (sort, limit, beginDate, endDate) => {
-	console.log(sort, limit, beginDate, endDate);
 	// get user email and IDToken
 	const user = firebase.auth().currentUser;
 	const IDToken = await user.getIdToken();
