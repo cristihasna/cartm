@@ -105,7 +105,7 @@ class Profile extends Component {
 							<ProfileSection
 								heading={{ title: 'History' }}
 								buttonLabel="view more"
-								buttonAction={() => console.warn('view more history')}>
+								buttonAction={() => this.props.navigation.navigate('History')}>
 								{latestProducts.length > 0 ? latestProducts : noDetailsToShow}
 							</ProfileSection>
 						</View>
