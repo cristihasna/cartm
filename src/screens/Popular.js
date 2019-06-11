@@ -192,36 +192,5 @@ const styles = StyleSheet.create({
 		color: colors.purple,
 		fontSize: 20,
 		fontWeight: 'bold'
-	},
-	graphContainer: {
-		marginBottom: 20
-	},
-	productContainer: {
-		marginVertical: 5
-	},
-	productTop: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between'
-	},
-	productName: {
-		color: colors.darkPurple,
-		fontSize: 20
-	},
-	productPrice: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		color: colors.purple
-	},
-	productRight: {
-		flexDirection: 'row',
-		justifyContent: 'space-between'
-	},
-	productDesc: {
-		fontSize: 14,
-		color: colors.purple,
-		fontStyle: 'italic',
-		marginTop: -5
 	}
 });
