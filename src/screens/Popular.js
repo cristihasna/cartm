@@ -52,7 +52,8 @@ class Expenses extends Component {
 	componentDidMount() {
 		const beginDate = this.props.history.beginDate;
 		const endDate = this.props.history.endDate;
-		this.props.fetchPopularProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+		if (!this.props.history.custom.popular)
+			this.props.fetchPopularProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
 	}
 
 	render() {

@@ -84,7 +84,8 @@ class Expenses extends Component {
 	componentDidMount() {
 		const beginDate = this.props.history.beginDate;
 		const endDate = this.props.history.endDate;
-		this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+		if (!this.props.history.custom.expensive)
+			this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
 	}
 
 	render() {
