@@ -17,6 +17,7 @@ import ParticipantPayment from './ParticipantPayment';
 import ProfileSection from './ProfileSection';
 import ProductCounter from './ProductCounter';
 import HistoryProduct from './HistoryProduct';
+import Graph from './Graph';
 
 module.exports = {
 	Logo,
@@ -37,5 +38,6 @@ module.exports = {
 	ParticipantPayment,
 	ProfileSection,
 	ProductCounter,
-	HistoryProduct
+	HistoryProduct,
+	Graph
 };

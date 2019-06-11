@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Animated } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { ScreenHeading, User, ProfileSection } from '../components';
+import { ScreenHeading, User, ProfileSection, Graph } from '../components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import colors from '../style/colors';
 import DatePicker from 'react-native-datepicker';
 import { fetchExpensiveProducts, updateHistoryBoundings, HistoryKind } from '../redux/actions/historyActions';
 
-const Date = ({ date, onChange }) => (
+const HistoryDate = ({ date, onChange }) => (
 	<View style={styles.datepickerContainer}>
-        <Icon name='calendar-alt' style={styles.dateIcon} />
+		<Icon name="calendar-alt" style={styles.dateIcon} />
 		<DatePicker
 			style={styles.datePicker}
 			customStyles={{
@@ -30,6 +30,7 @@ const Date = ({ date, onChange }) => (
 		/>
 	</View>
 );
+
 
 class Expenses extends Component {
 	_handleRefresh() {
@@ -77,9 +78,12 @@ class Expenses extends Component {
 				<View style={styles.contentWrapper}>
 					<ProfileSection heading={{ title: 'Expenses:', right: totalExpenses.toFixed(2) }} />
 					<View style={styles.datePickersContainer}>
-						<Date date={this.props.history.beginDate} onChange={console.log} />
+						<HistoryDate date={this.props.history.beginDate} onChange={console.log} />
 						<Icon name="long-arrow-alt-right" style={styles.datesArrow} />
-						<Date date={this.props.history.endDate} onChange={console.log} />
+						<HistoryDate date={this.props.history.endDate} onChange={console.log} />
+					</View>
+					<View style={styles.graphContainer}>
+						<Graph products={expensiveProducts} />
 					</View>
 				</View>
 			</View>
@@ -140,30 +144,30 @@ const styles = StyleSheet.create({
 	datesArrow: {
 		fontSize: 20,
 		color: colors.purple
-    },
-    datepickerContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 10
-    },
-    dateIcon: {
-        fontSize: 20,
-        color: colors.purple
-    },
-    datePicker: {
-        width: 'auto',
-        flex: 0,
-        marginLeft: 10,
-    },
-    datePickerInput: {
-        flex: 0,
-        borderWidth: 0,
-        alignItems: 'flex-start',
-    },
-    datePickerText: {
-        color: colors.purple,
-        fontSize: 20,
-        fontWeight: 'bold'
-    }
+	},
+	datepickerContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 10
+	},
+	dateIcon: {
+		fontSize: 20,
+		color: colors.purple
+	},
+	datePicker: {
+		width: 'auto',
+		flex: 0,
+		marginLeft: 10
+	},
+	datePickerInput: {
+		flex: 0,
+		borderWidth: 0,
+		alignItems: 'flex-start'
+	},
+	datePickerText: {
+		color: colors.purple,
+		fontSize: 20,
+		fontWeight: 'bold'
+	},
 });
