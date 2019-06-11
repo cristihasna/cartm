@@ -36,7 +36,7 @@ export default ({ products }) => {
 	return (
 		<View style={styles.graph}>
 			<YAxis
-				data={graphData.map((data) => data.amount)}
+				data={graphData.map((data) => Math.round(data.amount))}
 				style={{ paddingRight: 5, width: 25 }}
 				contentInset={{ top: 10, bottom: 10 }}
 				svg={axesSvg}

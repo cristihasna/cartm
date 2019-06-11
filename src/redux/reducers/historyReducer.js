@@ -23,8 +23,8 @@ export default function(state = initialState, action) {
 			return Object.assign(
 				{},
 				state,
-				action.boundings.beginDate ? { beginDate } : null,
-				action.boundings.endDate ? { endDate } : null
+				action.boundings.beginDate ? { beginDate: action.boundings.beginDate } : null,
+				action.boundings.endDate ? { endDate: action.boundings.endDate } : null
 			);
 		default:
 			return state;

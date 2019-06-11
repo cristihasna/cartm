@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Animated } from 'react-native';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { ScreenHeading, User, ProfileSection, Graph } from '../components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
@@ -25,17 +24,60 @@ const HistoryDate = ({ date, onChange }) => (
 			confirmBtnText="Confirm"
 			cancelBtnText="Cancel"
 			onDateChange={onChange}
-			androidMode="spinner"
+			androidMode="calendar"
 			showIcon={false}
 		/>
 	</View>
 );
 
+const Product = ({ product }) => {
+	const price = product.unitPrice;
+	const date = new Date(product.date);
+	const now = new Date();
+	const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+	const month = [ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC' ][
+		date.getMonth()
+	];
+	const year = date.getFullYear();
+	timeline = `${day} - ${month} - ${year}`;
+	if (now.getFullYear() === date.getFullYear() && now.getMonth() === date.getMonth()) {
+		if (now.getDate() === date.getDate()) timeline = 'today';
+		else if (now.getDate() - date.getDate() === 1) timeline = 'yesterday';
+	}
+	const description = `(${(price / product.participants.length).toFixed(2)} * ${product.participants
+		.length} participants)`;
+	let name = product.product.name;
+	if (name.length > 30) name = name.slice(0, 25) + '...' + name.slice(name.length - 3);
+	return (
+		<View style={styles.productContainer}>
+			<View style={styles.productTop}>
+				<Text style={styles.productName}>{name}</Text>
+				<Text style={styles.productPrice}>{price.toFixed(2)}</Text>
+			</View>
+			<View style={styles.productRight}>
+				<Text style={styles.productDesc}>{timeline}</Text>
+				{product.participants.length > 1 && <Text style={styles.productDesc}>{description}</Text>}
+			</View>
+		</View>
+	);
+};
 
 class Expenses extends Component {
 	_handleRefresh() {
 		const beginDate = this.props.history.beginDate;
 		const endDate = this.props.history.endDate;
+		this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+	}
+
+	_handleBeginDateUpdate(beginDate) {
+		const endDate = this.props.history.endDate;
+		this.props.updateHistoryBoundings({ beginDate: new Date(beginDate), endDate });
+		this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
+	}
+
+	_handleEndDateUpdate(endDate) {
+		const beginDate = this.props.history.beginDate;
+		this.props.updateHistoryBoundings({ beginDate, endDate });
 		this.props.fetchExpensiveProducts(HistoryKind.CUSTOM, null, beginDate, endDate);
 	}
 
@@ -59,8 +101,9 @@ class Expenses extends Component {
 
 		// default values
 		let totalExpenses = 0;
-		const expensiveProducts = this.props.history.custom.expensive;
-		if (expensiveProducts) {
+		let expensiveProducts = [];
+		if (this.props.history.custom.expensive) {
+			expensiveProducts = this.props.history.custom.expensive;
 			totalExpenses = expensiveProducts.reduce(
 				(total, product) => total + product.unitPrice * product.quantity / product.participants.length,
 				0 /*initial value*/
@@ -78,13 +121,33 @@ class Expenses extends Component {
 				<View style={styles.contentWrapper}>
 					<ProfileSection heading={{ title: 'Expenses:', right: totalExpenses.toFixed(2) }} />
 					<View style={styles.datePickersContainer}>
-						<HistoryDate date={this.props.history.beginDate} onChange={console.log} />
+						<HistoryDate
+							date={this.props.history.beginDate}
+							onChange={this._handleBeginDateUpdate.bind(this)}
+						/>
 						<Icon name="long-arrow-alt-right" style={styles.datesArrow} />
-						<HistoryDate date={this.props.history.endDate} onChange={console.log} />
+						<HistoryDate
+							date={this.props.history.endDate}
+							onChange={this._handleEndDateUpdate.bind(this)}
+						/>
 					</View>
 					<View style={styles.graphContainer}>
 						<Graph products={expensiveProducts} />
 					</View>
+					<ProfileSection heading={{ title: 'Most expensive products' }} containerStyle={{ flex: 1 }}>
+						{expensiveProducts.length > 0 ? (
+							<FlatList
+								refreshControl={refreshControl}
+								data={expensiveProducts}
+								keyExtractor={(product) => product._id}
+								renderItem={({ item }) => {
+									return <Product product={item} />;
+								}}
+							/>
+						) : (
+							noDetailsToShow
+						)}
+					</ProfileSection>
 				</View>
 			</View>
 		);
@@ -105,7 +168,7 @@ export default connect(mapStateToProps, {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		// flex: 1,
 		width: 100 + '%',
 		height: 100 + '%',
 		backgroundColor: colors.lightGrey
@@ -119,7 +182,8 @@ const styles = StyleSheet.create({
 	},
 	contentWrapper: {
 		flex: 1,
-		paddingHorizontal: 20
+		paddingHorizontal: 20,
+		paddingBottom: 40
 	},
 	scrollViewWrapper: {
 		paddingHorizontal: 20
@@ -170,4 +234,35 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		fontWeight: 'bold'
 	},
+	graphContainer: {
+		marginBottom: 20
+	},
+	productContainer: {
+		marginVertical: 5
+	},
+	productTop: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between'
+	},
+	productName: {
+		color: colors.darkPurple,
+		fontSize: 20
+	},
+	productPrice: {
+		fontSize: 24,
+		fontWeight: 'bold',
+		color: colors.purple
+	},
+	productRight: {
+		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
+	productDesc: {
+		fontSize: 14,
+		color: colors.purple,
+		fontStyle: 'italic',
+		marginTop: -5
+	}
 });
