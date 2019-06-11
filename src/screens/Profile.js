@@ -99,7 +99,7 @@ class Profile extends Component {
 							<ProfileSection
 								heading={{ title: 'Your most popular products' }}
 								buttonLabel="view more"
-								buttonAction={() => console.warn('view more popular products')}>
+								buttonAction={() => this.props.navigation.navigate('Popular')}>
 								{popularProducts.length > 0 ? popularProducts : noDetailsToShow}
 							</ProfileSection>
 							<ProfileSection

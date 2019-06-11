@@ -8,6 +8,7 @@ import Payment from './Payment';
 import Profile from './Profile';
 import Debts from './Debts';
 import Expenses from './Expenses';
+import Popular from './Popular';
 
 module.exports = {
 	Login,
@@ -19,5 +20,6 @@ module.exports = {
 	Payment,
 	Profile,
 	Debts,
-	Expenses
+	Expenses,
+	Popular
 };
