@@ -30,7 +30,7 @@ class Debt extends Component {
 
 	handleSetDeadline() {
 		this.swipeable.close();
-		this.props.onSetDeadline();
+		this.props.onSetDeadline(!!this.props.onPay);
 	}
 
 	renderPayButton(_, dragX) {
@@ -74,20 +74,22 @@ class Debt extends Component {
 				<Text style={styles.debtAmount}>{this.props.debt.toFixed(2)}</Text>
 			</View>
 		);
-		return this.props.onPay ? (
+		return (
 			<Swipeable
 				containerStyle={{ marginBottom: this.state.marginBottom, opacity: this.state.opacity }}
 				ref={(ref) => (this.swipeable = ref)}
 				friction={2}
 				onSwipeableLeftOpen={this.handleSetDeadline.bind(this)}
-				renderRightActions={this.renderPayButton.bind(this)}
 				renderLeftActions={this.renderDeadlineButton.bind(this)}
 				leftThreshold={50}
-				rightThreshold={50}>
+				{...(!!this.props.onPay
+					? {
+							rightThreshold: 50,
+							renderRightActions: this.renderPayButton.bind(this)
+						}
+					: null)}>
 				{debtContent}
 			</Swipeable>
-		) : (
-			debtContent
 		);
 	}
 }
@@ -135,7 +137,12 @@ class Debts extends Component {
 			owedBy = this.props.debts.owedBy.reduce((total, debt) => total + debt.amount, 0);
 			owedTo = this.props.debts.owedTo.reduce((total, debt) => total + debt.amount, 0);
 			owedByDebts = this.props.debts.owedBy.map((debt) => (
-				<Debt key={debt._id} debt={debt.amount} user={normalizeUserData(debt.owedTo)} />
+				<Debt
+					key={debt._id}
+					debt={debt.amount}
+					user={normalizeUserData(debt.owedTo)}
+					onSetDeadline={(withDeadline) => this.debtManager.show(debt, withDeadline)}
+				/>
 			));
 			owedToDebts = this.props.debts.owedTo.map((debt) => (
 				<Debt
@@ -143,7 +150,7 @@ class Debts extends Component {
 					debt={debt.amount}
 					user={normalizeUserData(debt.owedBy)}
 					onPay={() => this.handlePayed(debt)}
-					onSetDeadline={() => this.debtManager.show(debt)}
+					onSetDeadline={(withDeadline) => this.debtManager.show(debt, withDeadline)}
 				/>
 			));
 		}

@@ -39,18 +39,21 @@ export default class DebtDeadlineManager extends Component {
 		this.state = { visible: false, debt: null, date: null };
 	}
 
-	show(debt) {
-		this.setState({ visible: true, debt, date: debt.deadline });
+	show(debt, withDeadline) {
+		this.setState({ visible: true, debt, date: debt.deadline, withDeadline });
 	}
 
 	hide() {
-		this.setState({ visible: false, debt: null, date: null });
+		this.setState({ visible: false, debt: null, date: null, withDeadline: false });
 	}
 
 	render() {
 		let products = [];
+		let whoOwes = null;
+		let deadline = null;
 		let timeline;
 		if (this.state.debt) {
+			// compute formatted date of the session
 			products = this.state.debt.session.products.filter((product) =>
 				product.participants.includes(this.state.debt.owedBy.email)
 			);
@@ -66,15 +69,23 @@ export default class DebtDeadlineManager extends Component {
 				if (now.getDate() === date.getDate()) timeline = 'today';
 				else if (now.getDate() - date.getDate() === 1) timeline = 'yesterday';
 			}
-		}
-		let modalContent = this.state.debt ? (
-			<View style={styles.contentWrapper}>
-				<User containerStyle={styles.user} data={this.state.debt.owedBy} />
-				<Text style={styles.label}>owes you</Text>
-				<Text style={styles.amount}>{this.state.debt.amount.toFixed(2)}</Text>
-				<Text style={[ styles.label, { marginTop: 0 } ]}>{'from ' + timeline}</Text>
-				<View style={styles.deadlineContainer}>
-					<Icon name="user-clock" style={styles.deadlineIcon} />
+
+			// compute who owes who
+			whoOwes = this.state.withDeadline ? (
+				<React.Fragment>
+					<User containerStyle={styles.user} data={this.state.debt.owedBy} />
+					<Text style={styles.label}>owes you</Text>
+				</React.Fragment>
+			) : (
+				<React.Fragment>
+					<Text style={[ styles.label, { marginTop: 0, marginBottom: -10 } ]}>you owe</Text>
+					<User containerStyle={styles.user} data={this.state.debt.owedTo} />
+				</React.Fragment>
+			);
+
+			// compute the deadline info (with or without posibility to change the deadline)
+			deadline = this.state.withDeadline ? (
+				<React.Fragment>
 					<DatePicker
 						style={styles.datePicker}
 						customStyles={{
@@ -105,6 +116,27 @@ export default class DebtDeadlineManager extends Component {
 						onAction={() => this.setState({ date: null })}
 						disabled={!this.state.date}
 					/>
+				</React.Fragment>
+			) : (
+				<React.Fragment>
+					<Text style={this.state.date ? styles.datePickerText : styles.datePickerPH}>
+						{this.state.date || 'no deadline set'}
+					</Text>
+				</React.Fragment>
+			);
+		}
+		let modalContent = this.state.debt ? (
+			<View style={styles.contentWrapper}>
+				{whoOwes}
+				<Text style={styles.amount}>{this.state.debt.amount.toFixed(2)}</Text>
+				<Text style={[ styles.label, { marginTop: 0 } ]}>{'from ' + timeline}</Text>
+				<View
+					style={[
+						styles.deadlineContainer,
+						...[ !this.state.withDeadline ? styles.withoutDeadline : null ]
+					]}>
+					<Icon name="user-clock" style={styles.deadlineIcon} />
+					{deadline}
 				</View>
 				<Text style={[ styles.label, { marginTop: 50, fontStyle: 'italic' } ]}>for the following products</Text>
 				<ScrollView style={styles.productsContainer}>
@@ -178,6 +210,9 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center'
+	},
+	withoutDeadline: {
+		paddingVertical: 5
 	},
 	deadlineIcon: {
 		marginRight: 10,
