@@ -10,6 +10,7 @@ export default class CartProductsList extends Component {
 			<FlatList
 				style={styles.productsContainer}
 				data={this.props.products}
+				refreshControl={this.props.refreshControl}
 				keyExtractor={(product) => product._id}
 				renderItem={({ item }) => {
 					return (
@@ -32,7 +33,8 @@ CartProductsList.propTypes = {
 	participants: PropTypes.array.isRequired,
 	onParticipantsTrigger: PropTypes.func.isRequired,
 	onRemoveProduct: PropTypes.func.isRequired,
-	onPatchProduct: PropTypes.func.isRequired
+	onPatchProduct: PropTypes.func.isRequired,
+	refreshControl: PropTypes.element.isRequired
 };
 
 const styles = StyleSheet.create({

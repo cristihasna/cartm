@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ToastAndroid, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ToastAndroid, TouchableOpacity, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { MenuButton, RoundButton, CartProductsList } from '../components';
 import { AddProduct, SessionParticipantsManager, ProductParticipantsManager } from '../modals';
-import { leaveSession, addParticipantToSession, removeParticipantFromSession } from '../redux/actions/sessionActions';
+import {
+	fetchSession,
+	leaveSession,
+	addParticipantToSession,
+	removeParticipantFromSession
+} from '../redux/actions/sessionActions';
 import {
 	addProduct,
 	patchProduct,
@@ -56,6 +61,10 @@ class CurrentSession extends Component {
 		}
 	}
 
+	_handleRefresh() {
+		this.props.fetchSession();
+	}
+
 	_handlePatchProduct(product) {
 		this.props.patchProduct(product);
 	}
@@ -80,7 +89,12 @@ class CurrentSession extends Component {
 		this.props.removeParticipantFromProduct(product, participant.email);
 	}
 
-	render() {
+	render() {		
+		// refresh control component
+		const refreshControl = (
+			<RefreshControl refreshing={this.props.loading} onRefresh={this._handleRefresh.bind(this)} />
+		);
+
 		if (!this.props.session || !this.props.login) return null;
 		const emptyCart = (
 			<View style={styles.emptyCartContainer}>
@@ -101,8 +115,10 @@ class CurrentSession extends Component {
 			<View style={styles.cartContainer}>
 				<CartProductsList
 					products={this.props.session.products}
+					refreshControl={refreshControl}
 					participants={this.props.session.participants}
 					onRemoveProduct={this._handleRemoveProduct.bind(this)}
+					onRefresh={this._handleRefresh.bind(this)}
 					onParticipantsTrigger={this._showProductParticipantsModal.bind(this)}
 					onPatchProduct={this._handlePatchProduct.bind(this)}
 				/>
@@ -169,6 +185,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {
+	fetchSession,
 	leaveSession,
 	addProduct,
 	patchProduct,
