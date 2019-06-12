@@ -34,11 +34,9 @@ export default class App extends Component {
 			fcmToken = await firebase.messaging().getToken();
 			if (fcmToken) {
 				// user has a device token
-				console.log('fcmToken:', fcmToken);
 				await AsyncStorage.setItem('fcmToken', fcmToken);
 			}
 		}
-		console.log('fcmToken:', fcmToken);
 	}
 
 	//2
@@ -49,7 +47,6 @@ export default class App extends Component {
 			this.getToken();
 		} catch (error) {
 			// User has rejected permissions
-			console.log('permission rejected');
 		}
 	}
 
@@ -59,17 +56,16 @@ export default class App extends Component {
 		* */
 		this.notificationListener = firebase.notifications().onNotification((notification) => {
 			const { title, body } = notification;
-			console.log('onNotification:');
 
 			const localNotification = new firebase.notifications.Notification()
 				.setNotificationId(notification.notificationId)
 				.setTitle(title)
 				.setBody(body)
-				.setData({show_in_foreground: true})
+				.setData({ show_in_foreground: true })
 				.setSound('default')
 				.android.setChannelId('fcm_cartm_default_channel')
-				.android.setVibrate([300, 100, 300])
-			// console.log(localNotification);
+				.android.setVibrate([ 300, 100, 300 ]);
+
 			firebase.notifications().displayNotification(localNotification).then(() => console.log('displayed'));
 		});
 
@@ -83,27 +79,20 @@ export default class App extends Component {
 		/*
 		* If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
 		* */
-		this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-			const { title, body } = notificationOpen.notification;
-			console.log('onNotificationOpened:');
-			Alert.alert(title, body);
-		});
+		this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {});
 
 		/*
 		* If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
 		* */
 		const notificationOpen = await firebase.notifications().getInitialNotification();
 		if (notificationOpen) {
-			const { title, body } = notificationOpen.notification;
-			console.log('getInitialNotification:');
-			Alert.alert(title, body);
+			// notification open
 		}
 		/*
 		* Triggered for data only payload in foreground
 		* */
 		this.messageListener = firebase.messaging().onMessage((message) => {
 			//process data message
-			console.log('JSON.stringify:', JSON.stringify(message));
 		});
 	}
 
