@@ -1,16 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, RefreshControl, ToastAndroid } from 'react-native';
-import { MenuButton, RoundButton, CartProductsList } from '../components';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import colors from '../style/colors';
-
-const UserListButton = ({ onPress }) => {
-	return (
-		<TouchableOpacity style={styles.userListButtonContainer} onPress={onPress}>
-			<Icon name="users-cog" style={styles.userListButtonIcon} />
-		</TouchableOpacity>
-	);
-};
+import { AsyncStorage, ToastAndroid } from 'react-native';
+import ReceiptPresentational from './ReceiptPresentational';
 
 class Receipt extends Component {
 	constructor(props) {
@@ -63,20 +53,17 @@ class Receipt extends Component {
 		this.saveToStorage();
 	}
 
-	_showReceiptParticipantsModal() {
-		console.warn('show participants modal');
-	}
+    patchProduct(product){
+        console.log(product);
+    }
 
-	_showReceiptScanner() {
-		console.warn('receipt scanner');
-	}
+    removeProduct(product){
+        console.log(product);
+    }
 
-	_handleReset() {
+	reset() {
+		this.setState({ products: [] });
 		console.warn('reset');
-	}
-
-	_showReceiptSummary() {
-		console.warn('receipt summary');
 	}
 
 	addEmptyProduct() {
@@ -93,103 +80,17 @@ class Receipt extends Component {
 	}
 
 	render() {
-		// refresh control component
-		const refreshControl = <RefreshControl refreshing={this.state.loading} enabled={false} />;
-
 		return (
-			<View style={styles.container}>
-				<View style={styles.headerContainer}>
-					<MenuButton onPress={() => this.props.navigation.toggleDrawer()} logo />
-					<UserListButton onPress={this._showReceiptParticipantsModal.bind(this)} />
-				</View>
-				<View style={styles.productCartContainer}>
-					<CartProductsList
-						refreshControl={refreshControl}
-						products={this.state.products}
-						participants={this.state.participants}
-						onParticipantsTrigger={(product) => console.log(product)}
-						onRemoveProduct={(product) => console.log(product)}
-						onPatchProduct={(product) => console.log(product)}
-					/>
-				</View>
-				{this.state.products.length === 0 ? (
-					<View style={styles.emptyCartContainer}>
-						<Text style={styles.description}>
-							Scan a receipt and get the products, or enter them manually
-						</Text>
-						<View style={styles.emptyCartButtonsContainer}>
-							<RoundButton iconName="receipt" onPress={this._showReceiptScanner.bind(this)} large />
-							<RoundButton
-								iconName="edit"
-								onPress={this.addEmptyProduct.bind(this)}
-								containerStyle={{ marginTop: 25 }}
-							/>
-						</View>
-					</View>
-				) : (
-					<View style={styles.productsButtonsGroup}>
-						<View style={styles.productsButtonsWrapper}>
-							<RoundButton iconName="times" onPress={this._handleReset.bind(this)} />
-							<RoundButton iconName={'receipt'} onPress={this._showReceiptScanner.bind(this)} />
-							<RoundButton iconName={'edit'} onPress={this.addEmptyProduct.bind(this)} />
-							<RoundButton iconName="credit-card" onPress={this._showReceiptSummary.bind(this)} />
-						</View>
-					</View>
-				)}
-			</View>
+			<ReceiptPresentational
+				{...this.props}
+				{...this.state}
+				onRemoveProduct={this.removeProduct.bind(this)}
+				onPatchProduct={this.patchProduct.bind(this)}
+				addEmptyProduct={this.addEmptyProduct.bind(this)}
+				onReset={this.reset.bind(this)}
+			/>
 		);
 	}
 }
 
 export default Receipt;
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		width: 100 + '%',
-		height: 100 + '%',
-		backgroundColor: colors.lightGrey
-	},
-	headerContainer: {
-		paddingHorizontal: 10,
-		paddingVertical: 10,
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between'
-	},
-	userListButtonIcon: {
-		fontSize: 36,
-		color: colors.purple
-	},
-	description: {
-		paddingHorizontal: 40,
-		textAlign: 'center',
-		color: colors.darkPurple,
-		fontSize: 20
-	},
-	emptyCartContainer: {
-		flex: 20,
-		paddingTop: 20 + '%'
-	},
-	emptyCartButtonsContainer: {
-		display: 'flex',
-		width: 100 + '%',
-		alignItems: 'center',
-		marginTop: 75
-	},
-	productsButtonsGroup: {
-		height: 128
-    },
-    productCartContainer: {
-        flex: 1,
-        paddingHorizontal: 20
-    },
-	productsButtonsWrapper: {
-		flex: 1,
-		height: 100 + '%',
-		width: 100 + '%',
-		flexDirection: 'row',
-		justifyContent: 'space-evenly',
-		alignItems: 'center'
-	}
-});
