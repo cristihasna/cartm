@@ -83,7 +83,7 @@ class CurrentSession extends Component {
 	}
 
 	_handleRefresh() {
-		this.props.fetchSession();
+		this.props.fetchSession(this.props.navigation);
 	}
 
 	_handlePatchProduct(product) {

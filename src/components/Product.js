@@ -32,6 +32,17 @@ export default class Product extends Component {
 		this.setState({ unitPrice });
 	}
 
+	componentWillReceiveProps(newProps) {
+		const {unitPrice, quantity} = newProps.product;
+		if (unitPrice.toString() !== this.state.unitPrice || quantity.toString() !== this.state.quantity){
+			let state = this.state;
+			state.unitPrice = unitPrice.toString();
+			state.quantity = quantity.toString();
+			this.setState(state);
+		}
+		
+	}
+
 	_handlePriceBlur() {
 		let price = parseFloat(this.state.unitPrice);
 		if (isNaN(price)) {
