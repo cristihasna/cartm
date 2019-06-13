@@ -3,6 +3,8 @@ import { API_BASE_URL } from 'react-native-dotenv';
 import { ToastAndroid } from 'react-native';
 import firebase from 'react-native-firebase';
 
+console.log();
+
 export const addProduct = (product) => async (dispatch) => {
 	// set loading true
 	dispatch({ type: LOADING_STATE_CHANGE, loading: true });

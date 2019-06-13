@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ToastAndroid, TouchableOpacity, RefreshControl } from 'react-native';
+import { WS_URL } from 'react-native-dotenv';
+import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { MenuButton, RoundButton, CartProductsList } from '../components';
 import { AddProduct, SessionParticipantsManager, ProductParticipantsManager } from '../modals';
@@ -34,6 +36,25 @@ class CurrentSession extends Component {
 		this.sessionParticipantsModal = React.createRef();
 		this.productParticipantsModal = React.createRef();
 		this.newProductParticipantsModal = React.createRef();
+	}
+
+	componentDidMount() {
+		this.ws = new WebSocket(WS_URL);
+		this.ws.onopen = () => {
+			// send the user IDToken to authenticate on server-side
+			const user = firebase.auth().currentUser;
+			user
+				.getIdToken()
+				.then((IDToken) => {
+					this.ws.send(IDToken);
+				})
+				.catch((err) => console.log(err));
+		};
+		this.ws.onmessage = this._handleRefresh.bind(this);
+	}
+
+	componentWillUnmount() {
+		this.ws.close();
 	}
 
 	_showAddProductModal() {
@@ -89,7 +110,7 @@ class CurrentSession extends Component {
 		this.props.removeParticipantFromProduct(product, participant.email);
 	}
 
-	render() {		
+	render() {
 		// refresh control component
 		const refreshControl = (
 			<RefreshControl refreshing={this.props.loading} onRefresh={this._handleRefresh.bind(this)} />
