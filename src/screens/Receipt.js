@@ -1,13 +1,22 @@
 import React, { Component } from 'react';
 import { AsyncStorage, ToastAndroid } from 'react-native';
 import ReceiptPresentational from './ReceiptPresentational';
+import UUID from 'react-native-uuid';
+import { connect } from 'react-redux';
 
 class Receipt extends Component {
 	constructor(props) {
-		super(props);
+        super(props);
+        const newParticipant = {
+			payed: 0,
+            debt: 0,
+            _id: UUID.v1(),
+			profile: this.props.login,
+			email: this.props.login.email
+		};
 		this.state = {
 			products: [],
-			participants: [],
+			participants: [ newParticipant ],
 			loading: false
 		};
 	}
@@ -53,13 +62,13 @@ class Receipt extends Component {
 		this.saveToStorage();
 	}
 
-    patchProduct(product){
-        console.log(product);
-    }
+	patchProduct(product) {
+		console.log(product);
+	}
 
-    removeProduct(product){
-        console.log(product);
-    }
+	removeProduct(product) {
+		console.log(product);
+	}
 
 	reset() {
 		this.setState({ products: [] });
@@ -72,11 +81,49 @@ class Receipt extends Component {
 				barcode: null,
 				name: 'Product'
 			},
+			_id: UUID.v1(),
 			participants: [],
 			unitPrice: 1,
 			quantity: 1
 		};
 		this.setState({ products: this.state.products.concat(newProduct) });
+	}
+
+	addSessionParticipant(participant) {
+		const newParticipant = {
+			payed: 0,
+			debt: 0,
+            _id: UUID.v1(),
+			profile: participant,
+			email: participant.email
+		};
+
+		this.setState({ participants: this.state.participants.concat(newParticipant) });
+	}
+
+	removeSessionParticipant(participant) {
+		this.setState({ participants: this.state.participants.filter((other) => other.email !== participant.email) });
+	}
+
+	addProductParticipant(product, participant) {
+		let productIndex = this.state.products.findIndex((other) => other._id === product._id);
+		// check if product no longer exists
+		if (productIndex === -1) return;
+		let products = this.state.products;
+		products[productIndex].participants = products[productIndex].participants.concat(participant.profile);
+		this.setState({ products });
+	}
+
+	removeProductParticipant(product, participant) {
+		let productIndex = this.state.products.findIndex((other) => other._id === product._id);
+
+		// check if product no longer exists
+		if (productIndex === -1) return;
+		let products = this.state.products;
+		products[productIndex].participants = products[productIndex].participants.filter(
+			(other) => other.email !== participant.email
+		);
+		this.setState({ products });
 	}
 
 	render() {
@@ -86,6 +133,10 @@ class Receipt extends Component {
 				{...this.state}
 				onRemoveProduct={this.removeProduct.bind(this)}
 				onPatchProduct={this.patchProduct.bind(this)}
+				addSessionParticipant={this.addSessionParticipant.bind(this)}
+				removeSessionParticipant={this.removeSessionParticipant.bind(this)}
+				addProductParticipant={this.addProductParticipant.bind(this)}
+				removeProductParticipant={this.removeProductParticipant.bind(this)}
 				addEmptyProduct={this.addEmptyProduct.bind(this)}
 				onReset={this.reset.bind(this)}
 			/>
@@ -93,4 +144,8 @@ class Receipt extends Component {
 	}
 }
 
-export default Receipt;
+const mapStateToProps = (state) => ({
+    login: state.login
+})
+
+export default connect(mapStateToProps)(Receipt);

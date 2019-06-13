@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { MenuButton, RoundButton, CartProductsList } from '../components';
+import { SessionParticipantsManager, ProductParticipantsManager } from '../modals';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
 
@@ -17,13 +18,14 @@ export default class ReceiptPresentational extends Component {
 		super(props);
 	}
 
-	_handleParticipantsTrigger(product) {
-		console.log(product);
+	showProductParticipants(product) {
+		this.productParticipants.show(product);
 	}
 
-	showParticipantsModal() {
-		console.warn('participants modal');
-	}
+	showSessionParticipants() {
+		this.sessionParticipants.show();
+    }
+    
 	showReceiptScanner() {
 		console.warn('receipt scanner');
 	}
@@ -41,22 +43,27 @@ export default class ReceiptPresentational extends Component {
 			onRemoveProduct,
 			onPatchProduct,
 			onReset,
-			addEmptyProduct
+			addEmptyProduct,
+			addSessionParticipant,
+			removeSessionParticipant,
+			addProductParticipant,
+			removeProductParticipant
 		} = this.props;
 
+        console.log(participants, products);
 		const refreshControl = <RefreshControl refreshing={loading} enabled={false} />;
 		return (
 			<View style={styles.container}>
 				<View style={styles.headerContainer}>
 					<MenuButton onPress={() => navigation.toggleDrawer()} logo />
-					<UserListButton onPress={this.showParticipantsModal.bind(this)} />
+					<UserListButton onPress={this.showSessionParticipants.bind(this)} />
 				</View>
 				<View style={styles.productCartContainer}>
 					<CartProductsList
 						refreshControl={refreshControl}
 						products={products}
 						participants={participants}
-						onParticipantsTrigger={this._handleParticipantsTrigger.bind(this)}
+						onParticipantsTrigger={this.showProductParticipants.bind(this)}
 						onRemoveProduct={onRemoveProduct}
 						onPatchProduct={onPatchProduct}
 					/>
@@ -81,6 +88,18 @@ export default class ReceiptPresentational extends Component {
 						</View>
 					</View>
 				)}
+				<ProductParticipantsManager
+					ref={(ref) => (this.productParticipants = ref)}
+					onAdd={addProductParticipant}
+					onRemove={removeProductParticipant}
+					participants={participants}
+				/>
+				<SessionParticipantsManager
+					ref={(ref) => (this.sessionParticipants = ref)}
+					onAdd={addSessionParticipant}
+					onRemove={removeSessionParticipant}
+					participants={participants}
+				/>
 			</View>
 		);
 	}
