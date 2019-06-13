@@ -23,8 +23,8 @@ export const createSession = (navigation) => async (dispatch) => {
 		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
 		.then((res) => {
 			if (res.status === 201) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
-			else if (res.status !== 400) throw Error(res.body.message);
-			if (navigation) navigation.navigate('CurrentSession');
+			else if (res.status === 400) fetchSession(navigation)(dispatch);
+			else throw Error(res.body.message);
 			// set loading false
 			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
@@ -154,10 +154,10 @@ export const fetchSession = (navigation) => async (dispatch) => {
 	})
 		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
 		.then((res) => {
-			if (res.status === 200) {
+			if (res.status === 200 || res.status === 404) {
 				dispatch({ type: UPDATE_SESSION, sessionData: res.body });
-				if (navigation) navigation.navigate('CurrentSession');
-			} else if (res.status !== 404) throw Error(res.body.message);
+				if (navigation) navigation.navigate(res.status === 200 ? 'CurrentSession' : 'Home');
+			}
 			// set loading false
 			dispatch({ type: LOADING_STATE_CHANGE, loading: false });
 		})
