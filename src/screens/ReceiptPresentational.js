@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { MenuButton, RoundButton, CartProductsList } from '../components';
-import { SessionParticipantsManager, ProductParticipantsManager } from '../modals';
+import { SessionParticipantsManager, ProductParticipantsManager, ReceiptScanner } from '../modals';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
 
@@ -24,10 +24,10 @@ export default class ReceiptPresentational extends Component {
 
 	showSessionParticipants() {
 		this.sessionParticipants.show();
-    }
-    
+	}
+
 	showReceiptScanner() {
-		console.warn('receipt scanner');
+		this.receiptScanner.show();
 	}
 	showSummary() {
 		console.warn('summary');
@@ -50,7 +50,6 @@ export default class ReceiptPresentational extends Component {
 			removeProductParticipant
 		} = this.props;
 
-        console.log(participants, products);
 		const refreshControl = <RefreshControl refreshing={loading} enabled={false} />;
 		return (
 			<View style={styles.container}>
@@ -100,6 +99,7 @@ export default class ReceiptPresentational extends Component {
 					onRemove={removeSessionParticipant}
 					participants={participants}
 				/>
+				<ReceiptScanner ref={(ref) => (this.receiptScanner = ref)} />
 			</View>
 		);
 	}

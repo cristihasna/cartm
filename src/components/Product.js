@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, TextInput, Animated } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, TextInput, Animated, ToastAndroid } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import PropTypes from 'prop-types';
@@ -14,7 +14,8 @@ export default class Product extends Component {
 			marginBottom: new Animated.Value(0),
 			opacity: 1,
 			unitPrice: props.product.unitPrice.toString(),
-			quantity: props.product.quantity.toString()
+			quantity: props.product.quantity.toString(),
+			name: props.product.product.name
 		};
 	}
 
@@ -50,7 +51,11 @@ export default class Product extends Component {
 		if (quantity < 1 || quantity > 10) return false;
 		return true;
 	}
-	
+
+	isValidName(name) {
+		return /[a-zA-Z0-9\- \']/.test(name);
+	}
+
 	_handleQuantityChange(quantity) {
 		this.setState({ quantity });
 	}
@@ -63,7 +68,22 @@ export default class Product extends Component {
 		} else {
 			this.setState({ quantity: quantity.toString() });
 			let newProduct = this.props.product;
-			newProduct.unitPrice = quantity;
+			newProduct.quantity = quantity;
+			this.props.onPatch(newProduct);
+		}
+	}
+
+	_handleNameChange(name) {
+		this.setState({ name });
+	}
+
+	_handleNameBlur() {
+		if (!this.isValidName(this.state.name)) {
+			this.setState({ name: this.props.product.product.name });
+			ToastAndroid.show('Invalid name', ToastAndroid.SHORT);
+		} else {
+			let newProduct = this.props.product;
+			newProduct.product.name = this.state.name;
 			this.props.onPatch(newProduct);
 		}
 	}
@@ -94,9 +114,18 @@ export default class Product extends Component {
 				leftThreshold={50}>
 				<View style={styles.container}>
 					<View style={styles.productTitleContainer}>
-						<Text style={styles.productTitle}>
-							{product.name.length <= 25 ? product.name : product.name.substr(0, 22) + '...'}
-						</Text>
+						{this.props.product.changeName ? (
+							<TextInput
+								style={styles.productTitle}
+								value={this.state.name}
+								onChangeText={this._handleNameChange.bind(this)}
+								onBlur={this._handleNameBlur.bind(this)}
+							/>
+						) : (
+							<Text style={styles.productTitle}>
+								{product.name.length <= 25 ? product.name : product.name.substr(0, 22) + '...'}
+							</Text>
+						)}
 					</View>
 					<View style={styles.inputsContainer}>
 						<TextInput
@@ -105,6 +134,7 @@ export default class Product extends Component {
 							keyboardType="numeric"
 							onChangeText={this._handlePriceChange.bind(this)}
 							onBlur={this._handlePriceBlur.bind(this)}
+							selectTextOnFocus
 						/>
 						<Icon name="times" style={styles.timesIcon} />
 						<TextInput
@@ -113,6 +143,7 @@ export default class Product extends Component {
 							keyboardType="numeric"
 							onChangeText={this._handleQuantityChange.bind(this)}
 							onBlur={this._handleQuantityBlur.bind(this)}
+							selectTextOnFocus
 						/>
 					</View>
 					<TouchableOpacity onPress={this.props.onParticipantsTrigger} style={styles.participantsContainer}>

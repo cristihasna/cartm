@@ -6,11 +6,11 @@ import { connect } from 'react-redux';
 
 class Receipt extends Component {
 	constructor(props) {
-        super(props);
-        const newParticipant = {
+		super(props);
+		const newParticipant = {
 			payed: 0,
-            debt: 0,
-            _id: UUID.v1(),
+			debt: 0,
+			_id: UUID.v1(),
 			profile: this.props.login,
 			email: this.props.login.email
 		};
@@ -64,10 +64,18 @@ class Receipt extends Component {
 
 	patchProduct(product) {
 		console.log(product);
+		let products = this.state.products;
+		const productIndex = products.findIndex((other) => product._id === other._id);
+
+		// check if product still exists
+		if (productIndex === -1) return;
+		products[productIndex] = product;
+		this.setState({ products });
 	}
 
 	removeProduct(product) {
-		console.log(product);
+		let products = this.state.products.filter((other) => other._id !== product._id);
+		this.setState({ products });
 	}
 
 	reset() {
@@ -81,9 +89,10 @@ class Receipt extends Component {
 				barcode: null,
 				name: 'Product'
 			},
+			changeName: true,
 			_id: UUID.v1(),
 			participants: [],
-			unitPrice: 1,
+			unitPrice: 1.5,
 			quantity: 1
 		};
 		this.setState({ products: this.state.products.concat(newProduct) });
@@ -93,7 +102,7 @@ class Receipt extends Component {
 		const newParticipant = {
 			payed: 0,
 			debt: 0,
-            _id: UUID.v1(),
+			_id: UUID.v1(),
 			profile: participant,
 			email: participant.email
 		};
@@ -102,7 +111,16 @@ class Receipt extends Component {
 	}
 
 	removeSessionParticipant(participant) {
-		this.setState({ participants: this.state.participants.filter((other) => other.email !== participant.email) });
+		// remove participant from each product;
+		let products = this.state.products;
+		products.forEach((product) => {
+			product.participants = product.participants.filter((other) => other !== participant.email);
+		});
+		console.log(products);
+		this.setState({
+			participants: this.state.participants.filter((other) => other.email !== participant.email),
+			products
+		});
 	}
 
 	addProductParticipant(product, participant) {
@@ -145,7 +163,7 @@ class Receipt extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    login: state.login
-})
+	login: state.login
+});
 
 export default connect(mapStateToProps)(Receipt);
