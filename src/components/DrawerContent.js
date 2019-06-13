@@ -30,16 +30,18 @@ class DrawerContent extends Component {
 
 		return (
 			<ScrollView style={styles.container}>
-				{login && <View style={[ styles.profileContainer, styles.separatorAfter ]}>
-					<View style={styles.profileImgContainer}>
-						{login.photoURL ? (
-							<Image style={styles.profileImg} source={{ uri: login.photoURL }} />
-						) : (
-							<Text style={styles.profileImgReplacement}>{login.profileImgReplacement}</Text>
-						)}
+				{login && (
+					<View style={[ styles.profileContainer, styles.separatorAfter ]}>
+						<View style={styles.profileImgContainer}>
+							{login.photoURL ? (
+								<Image style={styles.profileImg} source={{ uri: login.photoURL }} />
+							) : (
+								<Text style={styles.profileImgReplacement}>{login.profileImgReplacement}</Text>
+							)}
+						</View>
+						<Text style={styles.displayName}>{login.displayName}</Text>
 					</View>
-					<Text style={styles.displayName}>{login.displayName}</Text>
-				</View>}
+				)}
 				{session ? (
 					<DrawerItem
 						label={'Current session'}
@@ -59,14 +61,10 @@ class DrawerContent extends Component {
 				<DrawerItem
 					label={'Split a receipt'}
 					iconName={'receipt'}
-					onPress={() => console.warn('navigate to split receipt')}
+					onPress={() => navigation.navigate('Receipt')}
 					containerStyle={styles.separatorAfter}
 				/>
-				<DrawerItem
-					label={'View profile'}
-					iconName={'user'}
-					onPress={() => navigation.navigate('Profile')}
-				/>
+				<DrawerItem label={'View profile'} iconName={'user'} onPress={() => navigation.navigate('Profile')} />
 				<DrawerItem
 					label={'Log out'}
 					iconName={'sign-out-alt'}
@@ -84,7 +82,7 @@ const mapStateToProps = (state) => ({
 	session: state.session
 });
 
-export default connect(mapStateToProps,  {createSession, logoutUser})(DrawerContent);
+export default connect(mapStateToProps, { createSession, logoutUser })(DrawerContent);
 
 const styles = StyleSheet.create({
 	separatorAfter: {
