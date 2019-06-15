@@ -12,13 +12,18 @@ class Receipt extends Component {
 			debt: 0,
 			_id: UUID.v1(),
 			profile: this.props.login,
-			email: this.props.login.email
+			email: this.props.login.email,
+			isHost: true
 		};
 		this.state = {
 			products: [],
 			participants: [ newParticipant ],
 			loading: false
 		};
+		this.stringifiedState = JSON.stringify({
+			products: this.state.products,
+			participants: this.state.participants
+		});
 	}
 
 	saveToStorage() {
@@ -29,6 +34,24 @@ class Receipt extends Component {
 		AsyncStorage.multiSet([ [ 'rProducts', stringifiedProducts ], [ 'rParticipants', stringifiedParticipants ] ])
 			.then(() => ToastAndroid.show('Receipt autosaved', ToastAndroid.SHORT))
 			.catch((err) => console.log(err));
+	}
+
+	computeDebts(products) {
+		const getTotalCost = (email, products) => {
+			let totalCost = 0;
+			for (let product of products) {
+				if (product.participants.length > 0 && product.participants.indexOf(email) > -1)
+					totalCost += product.unitPrice * product.quantity / product.participants.length;
+			}
+			return totalCost;
+		};
+
+		let participants = this.state.participants;
+		participants.forEach((participant) => {
+			participant.debt = getTotalCost(participant.email, products);
+		});
+
+		return participants;
 	}
 
 	componentDidMount() {
@@ -53,7 +76,15 @@ class Receipt extends Component {
 			});
 
 		this.autosaving = setInterval(() => {
-			if (this.props.navigation.state.routeName === 'Receipt') this.saveToStorage();
+			const newStringifiedState = JSON.stringify({
+				products: this.state.products,
+				participants: this.state.participants
+			});
+			// save to storage only if new changes occured
+			if (newStringifiedState !== this.stringifiedState) {
+				this.stringifiedState = newStringifiedState;
+				this.saveToStorage();
+			}
 		}, 1000 * 60 /* save once a minute */);
 	}
 
@@ -69,17 +100,20 @@ class Receipt extends Component {
 		// check if product still exists
 		if (productIndex === -1) return;
 		products[productIndex] = product;
-		this.setState({ products });
+		const participants = this.computeDebts(products);
+		this.setState({ products, participants });
 	}
 
 	removeProduct(product) {
 		let products = this.state.products.filter((other) => other._id !== product._id);
-		this.setState({ products });
+		const participants = this.computeDebts(products);
+		this.setState({ products, participants });
 	}
 
 	reset() {
-		this.setState({ products: [] });
 		console.warn('reset');
+		const participants = this.computeDebts(products);
+		this.setState({ products: [], participants });
 	}
 
 	addEmptyProduct() {
@@ -94,10 +128,12 @@ class Receipt extends Component {
 			unitPrice: 1.5,
 			quantity: 1
 		};
-		this.setState({ products: this.state.products.concat(newProduct) });
+		const products = this.state.products.concat(newProduct);
+		const participants = this.computeDebts(products);
+		this.setState({ products, participants });
 	}
 
-	addProducts(newProducts) {
+	async addProducts(newProducts) {
 		let products = this.state.products;
 		for (let product of newProducts) {
 			product.participants = this.state.participants.map((_) => _.email);
@@ -105,7 +141,8 @@ class Receipt extends Component {
 			product.changeName = true;
 			products.push(product);
 		}
-		this.setState({ products });
+		const participants = this.computeDebts(products);
+		this.setState({ products, participants });
 	}
 
 	addSessionParticipant(participant) {
@@ -126,8 +163,10 @@ class Receipt extends Component {
 		products.forEach((product) => {
 			product.participants = product.participants.filter((other) => other !== participant.email);
 		});
+
+		const participants = this.computeDebts(products);
 		this.setState({
-			participants: this.state.participants.filter((other) => other.email !== participant.email),
+			participants: participants.filter((other) => other.email !== participant.email),
 			products
 		});
 	}
@@ -138,7 +177,8 @@ class Receipt extends Component {
 		if (productIndex === -1) return;
 		let products = this.state.products;
 		products[productIndex].participants = products[productIndex].participants.concat(participant.profile);
-		this.setState({ products });
+		const participants = this.computeDebts(products);
+		this.setState({ products, participants });
 	}
 
 	removeProductParticipant(product, participant) {
@@ -150,7 +190,8 @@ class Receipt extends Component {
 		products[productIndex].participants = products[productIndex].participants.filter(
 			(other) => other.email !== participant.email
 		);
-		this.setState({ products });
+		const participants = this.computeDebts(products);
+		this.setState({ products, participants });
 	}
 
 	render() {

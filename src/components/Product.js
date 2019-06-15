@@ -116,7 +116,7 @@ export default class Product extends Component {
 					<View style={styles.productTitleContainer}>
 						{this.props.product.changeName ? (
 							<TextInput
-								style={styles.productTitle}
+								style={[ styles.productTitle, styles.productTitleInput ]}
 								value={this.state.name}
 								onChangeText={this._handleNameChange.bind(this)}
 								onBlur={this._handleNameBlur.bind(this)}
@@ -175,28 +175,30 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		width: 100 + '%',
 		height: 50,
-		justifyContent: 'center',
+		justifyContent: 'space-between',
 		paddingHorizontal: 10,
 		marginVertical: 3,
 		backgroundColor: colors.mediumGrey
 	},
 	productTitleContainer: {
-		position: 'absolute',
-		left: 10,
-		height: 50,
+		flex: 1,
+		alignItems: 'flex-start',
 		justifyContent: 'center'
 	},
 	productTitle: {
 		fontSize: 17,
+		textAlign: 'left',
 		color: colors.darkPurple
+	},
+	productTitleInput: {
+		textAlign: 'left'
 	},
 	inputsContainer: {
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'flex-end',
 		alignItems: 'center',
-		marginLeft: 10 + '%',
-		width: 100
+		marginHorizontal: 20
 	},
 	priceInput: {
 		fontSize: 18,
@@ -213,9 +215,6 @@ const styles = StyleSheet.create({
 		color: colors.darkPurple
 	},
 	participantsContainer: {
-		position: 'absolute',
-		right: 10,
-		height: 50,
 		justifyContent: 'center'
 	},
 	closeIconContainer: {

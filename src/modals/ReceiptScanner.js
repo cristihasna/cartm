@@ -18,8 +18,7 @@ export default class ReceiptScanner extends Component {
 
 	hide() {
 		this.setState({ visible: false, flashMode: 'off' });
-		this.props.onReadProducts(this.state.textBlocks.getProducts());
-		
+		this.state.textBlocks.getProducts().then(this.props.onReadProducts);
 	}
 
 	toggleFlash() {
@@ -27,8 +26,9 @@ export default class ReceiptScanner extends Component {
 	}
 
 	_handleRecognizeText(event) {
-		const noOfNewProducts = this.state.textBlocks.nextBatch(event);
-		if (noOfNewProducts) ToastAndroid.show(`Found ${noOfNewProducts} more products`, ToastAndroid.SHORT);
+		this.state.textBlocks.nextBatch(event).then((noOfNewProducts) => {
+			if (noOfNewProducts) ToastAndroid.show(`Found ${noOfNewProducts} more products`, ToastAndroid.SHORT);
+		})
 	}
 
 	_handleBackPress() {

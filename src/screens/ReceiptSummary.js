@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { normalizeUserData } from '../lib';
 import SummaryPresentational from './SummaryPresentational';
 
-class Summary extends Component {
+export default class ReceiptSummary extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {};
@@ -11,7 +10,8 @@ class Summary extends Component {
 
 	componentDidMount() {
 		let state = this.state;
-		for (let participant of this.props.session.participants) state[participant._id] = false;
+		const participants = this.props.navigation.getParam('rParticipants', []);
+		for (let participant of participants) state[participant._id] = false;
 		this.setState(state);
 	}
 
@@ -24,26 +24,17 @@ class Summary extends Component {
 		this.setState(state);
 	}
 
-	componentWillReceiveProps(newProps) {
-		if (!newProps.session) return;
-		let state = this.state;
-		for (let participant of newProps.session.participants) {
-			if (!state.hasOwnProperty(participant._id)) state[participant._id] = false;
-		}
-		this.setState(state);
-	}
-
-	computeParticipants() {
+	computeParticipants(receiptParticipants, receiptProducts) {
 		const participantsDict = {};
-		for (let participant of this.props.session.participants) {
+		for (let participant of receiptParticipants) {
 			participantsDict[participant.email] = normalizeUserData(participant.profile);
 		}
 
 		// constructing participants array
 		let participantsArray = [];
-		for (let participant of this.props.session.participants) {
+		for (let participant of receiptParticipants) {
 			let products = [];
-			for (let product of this.props.session.products) {
+			for (let product of receiptProducts) {
 				// skip products for which the current user is not a participant
 				if (!product.participants.includes(participant.email)) continue;
 				// user is participant of this product
@@ -60,29 +51,25 @@ class Summary extends Component {
 	}
 
 	render() {
-		if (!this.props.session) return null;
-		const total = this.props.session.products.reduce((total, product) => {
+		const receiptParticipants = this.props.navigation.getParam('rParticipants', []);
+		const receiptProducts = this.props.navigation.getParam('rProducts', []);
+
+		const total = receiptProducts.reduce((total, product) => {
 			const cost = product.unitPrice * product.quantity;
 			return total + cost;
 		}, 0);
-		const participantsArray = this.computeParticipants();
+
+		const participantsArray = this.computeParticipants(receiptParticipants, receiptProducts);
 		return (
-			<SummaryPresentational 
-				screenTitle='Back to cart'
+			<SummaryPresentational
+				screenTitle="Back to receipt"
 				participantsState={this.state}
 				participantsArray={participantsArray}
 				navigation={this.props.navigation}
 				total={total}
 				onToggle={this.handleToggle.bind(this)}
-				paymentScreenName='Payment' />
+				paymentScreenName="ReceiptPayment"
+			/>
 		);
 	}
 }
-
-const mapStateToProps = (state) => ({
-	loading: state.loading,
-	session: state.session,
-	login: state.login
-});
-
-export default connect(mapStateToProps)(Summary);

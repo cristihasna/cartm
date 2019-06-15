@@ -10,7 +10,8 @@ import {
 	Expenses,
 	Popular,
 	History,
-	Receipt
+	Receipt,
+	ReceiptSummary
 } from '../screens';
 import { DrawerContent } from '../components';
 import colors from '../style/colors';
@@ -26,6 +27,19 @@ const SessionNavigator = createStackNavigator(
 			header: null
 		},
 		initialRouteName: 'CurrentSession'
+	}
+);
+
+const ReceiptNavigator = createStackNavigator(
+	{
+		Receipt,
+		ReceiptSummary
+	},
+	{
+		defaultNavigationOptions: {
+			header: null
+		},
+		initialRouteName: 'Receipt'
 	}
 );
 
@@ -50,7 +64,7 @@ const AppNavigator = createDrawerNavigator(
 		Home,
 		SessionNavigator,
 		ProfileNavigator,
-		Receipt
+		ReceiptNavigator
 	},
 	{
 		defaultNavigationOptions: {

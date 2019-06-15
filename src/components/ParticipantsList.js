@@ -32,14 +32,12 @@ const styles = StyleSheet.create({
 	container: {
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		width: 100 + '%'
+		justifyContent: 'flex-end'
 	},
 	participantContainer: {
 		backgroundColor: colors.white,
 		borderRadius: 35,
 		borderWidth: 3,
-		// flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderColor: colors.mediumGrey,

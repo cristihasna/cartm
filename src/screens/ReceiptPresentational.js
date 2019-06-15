@@ -30,7 +30,10 @@ export default class ReceiptPresentational extends Component {
 		this.receiptScanner.show();
 	}
 	showSummary() {
-		console.warn('summary');
+		this.props.navigation.navigate('ReceiptSummary', {
+			rParticipants: this.props.participants,
+			rProducts: this.props.products
+		});
 	}
 
 	render() {

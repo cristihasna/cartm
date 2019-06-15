@@ -61,17 +61,17 @@ export default class TextBlocks {
 		// if the regex matched a false positive and the quantity or price strings are empty, skip the product
 		if (!quantity || !unitPrice) return;
 
-		/*  check if the quantity is a fractional number, in which case 
-			we will store the quantity as 1 and the unitPrice as quantity * unitPrice 
+		/*  check if the quantity is a fractional number or greater than 10, in which case 
+			we will store the quantity as 1
 			THIS IS NOT IDEAL
-        */
-		if (+quantity % 1 !== 0) {
-			unitPrice = +quantity * +unitPrice;
+		*/
+		if (+quantity % 1 !== 0 || +quantity > 10) {
 			quantity = 1;
 		} else {
 			quantity = +quantity;
-			unitPrice = +unitPrice;
 		}
+		// scale the number to two decimal points
+		unitPrice = Math.round(unitPrice * 100) / 100;
 		const newProduct = {
 			_id: UUID.v1(),
 			product: {
@@ -164,10 +164,10 @@ export default class TextBlocks {
 			// remove lines that start with a number and are not a quantity and price section
 			// this is common for receipts that have a total price on the right side
 			.filter((line) => line.quantityAndPrice || this.productName.exec(line.value));
-		return this.processLines(lines);
+		return Promise.resolve(this.processLines(lines));
 	}
 
 	getProducts() {
-		return this.products;
+		return Promise.resolve(this.products);
 	}
 }
