@@ -44,6 +44,7 @@ export default class ReceiptPresentational extends Component {
 			onPatchProduct,
 			onReset,
 			addEmptyProduct,
+			addProducts,
 			addSessionParticipant,
 			removeSessionParticipant,
 			addProductParticipant,
@@ -99,7 +100,7 @@ export default class ReceiptPresentational extends Component {
 					onRemove={removeSessionParticipant}
 					participants={participants}
 				/>
-				<ReceiptScanner ref={(ref) => (this.receiptScanner = ref)} />
+				<ReceiptScanner ref={(ref) => (this.receiptScanner = ref)} onReadProducts={addProducts} />
 			</View>
 		);
 	}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, View, Modal, TouchableOpacity, StyleSheet, ToastAndroid } from 'react-native';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import colors from '../style/colors';
@@ -18,7 +18,8 @@ export default class ReceiptScanner extends Component {
 
 	hide() {
 		this.setState({ visible: false, flashMode: 'off' });
-		console.log(this.state.textBlocks.getProducts());
+		this.props.onReadProducts(this.state.textBlocks.getProducts());
+		
 	}
 
 	toggleFlash() {
@@ -26,7 +27,8 @@ export default class ReceiptScanner extends Component {
 	}
 
 	_handleRecognizeText(event) {
-		console.log(event);
+		const noOfNewProducts = this.state.textBlocks.nextBatch(event);
+		if (noOfNewProducts) ToastAndroid.show(`Found ${noOfNewProducts} more products`, ToastAndroid.SHORT);
 	}
 
 	_handleBackPress() {
@@ -81,7 +83,7 @@ export default class ReceiptScanner extends Component {
 }
 
 ReceiptScanner.propTypes = {
-	
+	onReadProducts: PropTypes.func.isRequired
 };
 
 const styles = StyleSheet.create({

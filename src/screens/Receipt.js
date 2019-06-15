@@ -63,7 +63,6 @@ class Receipt extends Component {
 	}
 
 	patchProduct(product) {
-		console.log(product);
 		let products = this.state.products;
 		const productIndex = products.findIndex((other) => product._id === other._id);
 
@@ -91,11 +90,22 @@ class Receipt extends Component {
 			},
 			changeName: true,
 			_id: UUID.v1(),
-			participants: [],
+			participants: this.state.participants.map((_) => _.email),
 			unitPrice: 1.5,
 			quantity: 1
 		};
 		this.setState({ products: this.state.products.concat(newProduct) });
+	}
+
+	addProducts(newProducts) {
+		let products = this.state.products;
+		for (let product of newProducts) {
+			product.participants = this.state.participants.map((_) => _.email);
+
+			product.changeName = true;
+			products.push(product);
+		}
+		this.setState({ products });
 	}
 
 	addSessionParticipant(participant) {
@@ -116,7 +126,6 @@ class Receipt extends Component {
 		products.forEach((product) => {
 			product.participants = product.participants.filter((other) => other !== participant.email);
 		});
-		console.log(products);
 		this.setState({
 			participants: this.state.participants.filter((other) => other.email !== participant.email),
 			products
@@ -156,6 +165,7 @@ class Receipt extends Component {
 				addProductParticipant={this.addProductParticipant.bind(this)}
 				removeProductParticipant={this.removeProductParticipant.bind(this)}
 				addEmptyProduct={this.addEmptyProduct.bind(this)}
+				addProducts={this.addProducts.bind(this)}
 				onReset={this.reset.bind(this)}
 			/>
 		);
