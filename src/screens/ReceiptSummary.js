@@ -1,35 +1,22 @@
 import React, { Component } from 'react';
-import { AsyncStorage } from 'react-native';
 import { normalizeUserData } from '../lib';
 import SummaryPresentational from './SummaryPresentational';
+import { connect } from 'react-redux';
 
-export default class ReceiptSummary extends Component {
+class ReceiptSummary extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {};
 	}
-
-	componentDidMount() {
-		let state = this.state;
-		const participants = this.props.navigation.getParam('rParticipants', []);
-		const products = this.props.navigation.getParam('rProducts', []);
-		// save current instance of the receipt
-		AsyncStorage.multiSet([
-			[ 'rProducts', JSON.stringify(products) ],
-			[ 'rParticipants', JSON.stringify(participants) ]
-		])
-			.then(() => {})
-			.catch((err) => console.log(err));
-		for (let participant of participants) state[participant._id] = false;
-		this.setState(state);
-	}
-
+	
 	handleToggle(participantId) {
 		let state = this.state;
 		for (let key in state) {
 			if (key !== participantId) state[key] = false;
 		}
 		if (state.hasOwnProperty(participantId)) state[participantId] = !state[participantId];
+		else state[participantId] = true;
+		
 		this.setState(state);
 	}
 
@@ -60,8 +47,8 @@ export default class ReceiptSummary extends Component {
 	}
 
 	render() {
-		const receiptParticipants = this.props.navigation.getParam('rParticipants', []);
-		const receiptProducts = this.props.navigation.getParam('rProducts', []);
+		const receiptParticipants = this.props.participants;
+		const receiptProducts = this.props.products;
 
 		const total = receiptProducts.reduce((total, product) => {
 			const cost = product.unitPrice * product.quantity;
@@ -82,3 +69,10 @@ export default class ReceiptSummary extends Component {
 		);
 	}
 }
+
+const mapStateToProps = (state) => ({
+	participants: state.receipt.participants,
+	products: state.receipt.products
+});
+
+export default connect(mapStateToProps)(ReceiptSummary);

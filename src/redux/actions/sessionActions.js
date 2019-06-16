@@ -39,6 +39,7 @@ export const addParticipantToSession = (email) => async (dispatch) => {
 	// set loading true
 	dispatch({ type: LOADING_STATE_CHANGE, loading: true });
 
+	
 	// get user email and IDToken
 	const user = firebase.auth().currentUser;
 	const IDToken = await user.getIdToken();

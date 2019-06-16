@@ -3,34 +3,24 @@ import { AsyncStorage, ToastAndroid } from 'react-native';
 import ReceiptPresentational from './ReceiptPresentational';
 import UUID from 'react-native-uuid';
 import { connect } from 'react-redux';
+import { resetReceipt, updateReceipt } from '../redux/actions/receiptActions';
 
 class Receipt extends Component {
 	constructor(props) {
 		super(props);
-		const newParticipant = {
-			payed: 0,
-			debt: 0,
-			_id: UUID.v1(),
-			profile: this.props.login,
-			email: this.props.login.email,
-			isHost: true
-		};
 		this.state = {
-			products: [],
-			participants: [ newParticipant ],
 			loading: false
 		};
 		this.stringifiedState = JSON.stringify({
-			products: this.state.products,
-			participants: this.state.participants
+			products: this.props.products,
+			participants: this.props.participants
 		});
 	}
 
 	saveToStorage() {
 		// save current instance of the receipt
-		const stringifiedProducts = JSON.stringify(this.state.products);
-		const stringifiedParticipants = JSON.stringify(this.state.participants);
-		console.log('Saving to storage: ', this.state.products, this.state.participants);
+		const stringifiedProducts = JSON.stringify(this.props.products);
+		const stringifiedParticipants = JSON.stringify(this.props.participants);
 		AsyncStorage.multiSet([ [ 'rProducts', stringifiedProducts ], [ 'rParticipants', stringifiedParticipants ] ])
 			.then(() => ToastAndroid.show('Receipt autosaved', ToastAndroid.SHORT))
 			.catch((err) => console.log(err));
@@ -46,7 +36,7 @@ class Receipt extends Component {
 			return totalCost;
 		};
 
-		let participants = this.state.participants;
+		let participants = this.props.participants;
 		participants.forEach((participant) => {
 			participant.debt = getTotalCost(participant.email, products);
 		});
@@ -65,7 +55,8 @@ class Receipt extends Component {
 					// retreiving saved instance of receipt
 					products = JSON.parse(stringifiedProducts);
 					participants = JSON.parse(stringifiedParticipants);
-					this.setState({ products, participants, loading: false });
+					this.props.updateReceipt({ products, participants });
+					this.setState({ loading: false });
 				} else this.setState({ loading: false });
 			})
 			.catch((err) => {
@@ -75,8 +66,8 @@ class Receipt extends Component {
 
 		this.autosaving = setInterval(() => {
 			const newStringifiedState = JSON.stringify({
-				products: this.state.products,
-				participants: this.state.participants
+				products: this.props.products,
+				participants: this.props.participants
 			});
 			// save to storage only if new changes occured
 			if (newStringifiedState !== this.stringifiedState) {
@@ -92,25 +83,24 @@ class Receipt extends Component {
 	}
 
 	patchProduct(product) {
-		let products = this.state.products;
+		let products = this.props.products;
 		const productIndex = products.findIndex((other) => product._id === other._id);
 
 		// check if product still exists
 		if (productIndex === -1) return;
 		products[productIndex] = product;
 		const participants = this.computeDebts(products);
-		this.setState({ products, participants });
+		this.props.updateReceipt({ products, participants });
 	}
 
 	removeProduct(product) {
-		let products = this.state.products.filter((other) => other._id !== product._id);
+		let products = this.props.products.filter((other) => other._id !== product._id);
 		const participants = this.computeDebts(products);
-		this.setState({ products, participants });
+		this.props.updateReceipt({ products, participants });
 	}
 
 	reset() {
-		const participants = this.computeDebts(products);
-		this.setState({ products: [], participants });
+		this.props.resetReceipt();
 	}
 
 	addEmptyProduct() {
@@ -121,25 +111,29 @@ class Receipt extends Component {
 			},
 			changeName: true,
 			_id: UUID.v1(),
-			participants: this.state.participants.map((_) => _.email),
+			participants: this.props.participants.map((_) => _.email),
 			unitPrice: 1.5,
 			quantity: 1
 		};
-		const products = this.state.products.concat(newProduct);
+		const products = this.props.products.concat(newProduct);
 		const participants = this.computeDebts(products);
-		this.setState({ products, participants });
+		this.props.updateReceipt({ products, participants });
 	}
 
-	async addProducts(newProducts) {
-		let products = this.state.products;
+	shouldComponentUpdate(newProps) {
+		return true;
+	}
+
+	addProducts(newProducts) {
+		let products = this.props.products;
 		for (let product of newProducts) {
-			product.participants = this.state.participants.map((_) => _.email);
+			product.participants = this.props.participants.map((_) => _.email);
 
 			product.changeName = true;
 			products.push(product);
 		}
 		const participants = this.computeDebts(products);
-		this.setState({ products, participants });
+		this.props.updateReceipt({ products, participants });
 	}
 
 	addSessionParticipant(participant) {
@@ -151,51 +145,56 @@ class Receipt extends Component {
 			email: participant.email
 		};
 
-		this.setState({ participants: this.state.participants.concat(newParticipant) });
+		this.props.updateReceipt({
+			participants: this.props.participants.concat(newParticipant),
+			products: this.props.products
+		});
 	}
 
 	removeSessionParticipant(participant) {
 		// remove participant from each product;
-		let products = this.state.products;
+		let products = this.props.products;
 		products.forEach((product) => {
 			product.participants = product.participants.filter((other) => other !== participant.email);
 		});
 
 		const participants = this.computeDebts(products);
-		this.setState({
+		this.props.updateReceipt({
 			participants: participants.filter((other) => other.email !== participant.email),
 			products
 		});
 	}
 
 	addProductParticipant(product, participant) {
-		let productIndex = this.state.products.findIndex((other) => other._id === product._id);
+		let productIndex = this.props.products.findIndex((other) => other._id === product._id);
 		// check if product no longer exists
 		if (productIndex === -1) return;
-		let products = this.state.products;
+		let products = this.props.products;
 		products[productIndex].participants = products[productIndex].participants.concat(participant.profile);
 		const participants = this.computeDebts(products);
-		this.setState({ products, participants });
+		this.props.updateReceipt({ products, participants });
 	}
 
 	removeProductParticipant(product, participant) {
-		let productIndex = this.state.products.findIndex((other) => other._id === product._id);
+		let productIndex = this.props.products.findIndex((other) => other._id === product._id);
 
 		// check if product no longer exists
 		if (productIndex === -1) return;
-		let products = this.state.products;
+		let products = this.props.products;
 		products[productIndex].participants = products[productIndex].participants.filter(
 			(other) => other.email !== participant.email
 		);
 		const participants = this.computeDebts(products);
-		this.setState({ products, participants });
+		this.props.updateReceipt({ products, participants });
 	}
 
 	render() {
 		return (
 			<ReceiptPresentational
-				{...this.props}
-				{...this.state}
+				loading={this.props.loading || this.state.loading}
+				navigation={this.props.navigation}
+				products={this.props.products}
+				participants={this.props.participants}
 				onRemoveProduct={this.removeProduct.bind(this)}
 				onPatchProduct={this.patchProduct.bind(this)}
 				addSessionParticipant={this.addSessionParticipant.bind(this)}
@@ -211,7 +210,13 @@ class Receipt extends Component {
 }
 
 const mapStateToProps = (state) => ({
-	login: state.login
+	login: state.login,
+	receipt: state.receipt,
+	participants: state.receipt.participants,
+	products: state.receipt.products
 });
 
-export default connect(mapStateToProps)(Receipt);
+export default connect(mapStateToProps, {
+	resetReceipt,
+	updateReceipt
+})(Receipt);

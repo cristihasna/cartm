@@ -4,11 +4,13 @@ import sessionReducer from './sessionReducer';
 import loadingReducer from './loadingReducer';
 import debtsReducer from './debtsReducer';
 import historyReducer from './historyReducer';
+import receiptReducer from './receiptReducer';
 
 export default combineReducers({
     login: loginReducer,
     session: sessionReducer,
     loading: loadingReducer,
     debts: debtsReducer,
-    history: historyReducer
+    history: historyReducer,
+    receipt: receiptReducer
 })
