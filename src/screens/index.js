@@ -12,6 +12,7 @@ import Popular from './Popular';
 import History from './History';
 import Receipt from './Receipt';
 import ReceiptSummary from './ReceiptSummary';
+import ReceiptPayment from './ReceiptPayment';
 
 module.exports = {
 	Login,
@@ -27,5 +28,6 @@ module.exports = {
 	Popular,
 	History,
 	Receipt,
-	ReceiptSummary
+	ReceiptSummary,
+	ReceiptPayment
 };

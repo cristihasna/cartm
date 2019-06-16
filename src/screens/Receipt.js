@@ -61,12 +61,10 @@ class Receipt extends Component {
 		// check if there is a saved instance of a receipt
 		AsyncStorage.multiGet([ 'rProducts', 'rParticipants' ])
 			.then(([ [ a, stringifiedProducts ], [ b, stringifiedParticipants ] ]) => {
-				console.log(stringifiedProducts, stringifiedParticipants);
 				if (stringifiedProducts && stringifiedParticipants) {
 					// retreiving saved instance of receipt
 					products = JSON.parse(stringifiedProducts);
 					participants = JSON.parse(stringifiedParticipants);
-					console.log('retrieving from storage', products, participants);
 					this.setState({ products, participants, loading: false });
 				} else this.setState({ loading: false });
 			})
@@ -111,7 +109,6 @@ class Receipt extends Component {
 	}
 
 	reset() {
-		console.warn('reset');
 		const participants = this.computeDebts(products);
 		this.setState({ products: [], participants });
 	}

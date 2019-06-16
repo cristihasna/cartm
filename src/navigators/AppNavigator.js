@@ -11,7 +11,8 @@ import {
 	Popular,
 	History,
 	Receipt,
-	ReceiptSummary
+	ReceiptSummary,
+	ReceiptPayment
 } from '../screens';
 import { DrawerContent } from '../components';
 import colors from '../style/colors';
@@ -33,7 +34,8 @@ const SessionNavigator = createStackNavigator(
 const ReceiptNavigator = createStackNavigator(
 	{
 		Receipt,
-		ReceiptSummary
+		ReceiptSummary,
+		ReceiptPayment
 	},
 	{
 		defaultNavigationOptions: {

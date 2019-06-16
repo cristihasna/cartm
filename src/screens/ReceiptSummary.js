@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { AsyncStorage } from 'react-native';
 import { normalizeUserData } from '../lib';
 import SummaryPresentational from './SummaryPresentational';
 
@@ -11,6 +12,14 @@ export default class ReceiptSummary extends Component {
 	componentDidMount() {
 		let state = this.state;
 		const participants = this.props.navigation.getParam('rParticipants', []);
+		const products = this.props.navigation.getParam('rProducts', []);
+		// save current instance of the receipt
+		AsyncStorage.multiSet([
+			[ 'rProducts', JSON.stringify(products) ],
+			[ 'rParticipants', JSON.stringify(participants) ]
+		])
+			.then(() => {})
+			.catch((err) => console.log(err));
 		for (let participant of participants) state[participant._id] = false;
 		this.setState(state);
 	}
