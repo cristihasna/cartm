@@ -1,6 +1,19 @@
 import { createDrawerNavigator, createStackNavigator } from 'react-navigation';
 
-import { Home, CurrentSession, Summary, Payment, Profile, Debts, Expenses, Popular, History } from '../screens';
+import {
+	Home,
+	CurrentSession,
+	Summary,
+	Payment,
+	Profile,
+	Debts,
+	Expenses,
+	Popular,
+	History,
+	Receipt,
+	ReceiptSummary,
+	ReceiptPayment
+} from '../screens';
 import { DrawerContent } from '../components';
 import colors from '../style/colors';
 
@@ -15,6 +28,20 @@ const SessionNavigator = createStackNavigator(
 			header: null
 		},
 		initialRouteName: 'CurrentSession'
+	}
+);
+
+const ReceiptNavigator = createStackNavigator(
+	{
+		Receipt,
+		ReceiptSummary,
+		ReceiptPayment
+	},
+	{
+		defaultNavigationOptions: {
+			header: null
+		},
+		initialRouteName: 'Receipt'
 	}
 );
 
@@ -38,7 +65,8 @@ const AppNavigator = createDrawerNavigator(
 	{
 		Home,
 		SessionNavigator,
-		ProfileNavigator
+		ProfileNavigator,
+		ReceiptNavigator
 	},
 	{
 		defaultNavigationOptions: {

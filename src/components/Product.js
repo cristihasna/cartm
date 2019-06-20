@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, TextInput, Animated } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, TextInput, Animated, ToastAndroid } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import PropTypes from 'prop-types';
@@ -14,7 +14,8 @@ export default class Product extends Component {
 			marginBottom: new Animated.Value(0),
 			opacity: 1,
 			unitPrice: props.product.unitPrice.toString(),
-			quantity: props.product.quantity.toString()
+			quantity: props.product.quantity.toString(),
+			name: props.product.product.name
 		};
 	}
 
@@ -61,7 +62,11 @@ export default class Product extends Component {
 		if (quantity < 1 || quantity > 10) return false;
 		return true;
 	}
-	
+
+	isValidName(name) {
+		return /[a-zA-Z0-9\- \']/.test(name);
+	}
+
 	_handleQuantityChange(quantity) {
 		this.setState({ quantity });
 	}
@@ -74,7 +79,22 @@ export default class Product extends Component {
 		} else {
 			this.setState({ quantity: quantity.toString() });
 			let newProduct = this.props.product;
-			newProduct.unitPrice = quantity;
+			newProduct.quantity = quantity;
+			this.props.onPatch(newProduct);
+		}
+	}
+
+	_handleNameChange(name) {
+		this.setState({ name });
+	}
+
+	_handleNameBlur() {
+		if (!this.isValidName(this.state.name)) {
+			this.setState({ name: this.props.product.product.name });
+			ToastAndroid.show('Invalid name', ToastAndroid.SHORT);
+		} else {
+			let newProduct = this.props.product;
+			newProduct.product.name = this.state.name;
 			this.props.onPatch(newProduct);
 		}
 	}
@@ -105,9 +125,18 @@ export default class Product extends Component {
 				leftThreshold={50}>
 				<View style={styles.container}>
 					<View style={styles.productTitleContainer}>
-						<Text style={styles.productTitle}>
-							{product.name.length <= 25 ? product.name : product.name.substr(0, 22) + '...'}
-						</Text>
+						{this.props.product.changeName ? (
+							<TextInput
+								style={[ styles.productTitle, styles.productTitleInput ]}
+								value={this.state.name}
+								onChangeText={this._handleNameChange.bind(this)}
+								onBlur={this._handleNameBlur.bind(this)}
+							/>
+						) : (
+							<Text style={styles.productTitle}>
+								{product.name.length <= 25 ? product.name : product.name.substr(0, 22) + '...'}
+							</Text>
+						)}
 					</View>
 					<View style={styles.inputsContainer}>
 						<TextInput
@@ -116,6 +145,7 @@ export default class Product extends Component {
 							keyboardType="numeric"
 							onChangeText={this._handlePriceChange.bind(this)}
 							onBlur={this._handlePriceBlur.bind(this)}
+							selectTextOnFocus
 						/>
 						<Icon name="times" style={styles.timesIcon} />
 						<TextInput
@@ -124,6 +154,7 @@ export default class Product extends Component {
 							keyboardType="numeric"
 							onChangeText={this._handleQuantityChange.bind(this)}
 							onBlur={this._handleQuantityBlur.bind(this)}
+							selectTextOnFocus
 						/>
 					</View>
 					<TouchableOpacity onPress={this.props.onParticipantsTrigger} style={styles.participantsContainer}>
@@ -155,28 +186,30 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		width: 100 + '%',
 		height: 50,
-		justifyContent: 'center',
+		justifyContent: 'space-between',
 		paddingHorizontal: 10,
 		marginVertical: 3,
 		backgroundColor: colors.mediumGrey
 	},
 	productTitleContainer: {
-		position: 'absolute',
-		left: 10,
-		height: 50,
+		flex: 1,
+		alignItems: 'flex-start',
 		justifyContent: 'center'
 	},
 	productTitle: {
 		fontSize: 17,
+		textAlign: 'left',
 		color: colors.darkPurple
+	},
+	productTitleInput: {
+		textAlign: 'left'
 	},
 	inputsContainer: {
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'flex-end',
 		alignItems: 'center',
-		marginLeft: 10 + '%',
-		width: 100
+		marginHorizontal: 20
 	},
 	priceInput: {
 		fontSize: 18,
@@ -193,9 +226,6 @@ const styles = StyleSheet.create({
 		color: colors.darkPurple
 	},
 	participantsContainer: {
-		position: 'absolute',
-		right: 10,
-		height: 50,
 		justifyContent: 'center'
 	},
 	closeIconContainer: {

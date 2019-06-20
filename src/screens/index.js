@@ -10,6 +10,9 @@ import Debts from './Debts';
 import Expenses from './Expenses';
 import Popular from './Popular';
 import History from './History';
+import Receipt from './Receipt';
+import ReceiptSummary from './ReceiptSummary';
+import ReceiptPayment from './ReceiptPayment';
 
 module.exports = {
 	Login,
@@ -23,5 +26,8 @@ module.exports = {
 	Debts,
 	Expenses,
 	Popular,
-	History
+	History,
+	Receipt,
+	ReceiptSummary,
+	ReceiptPayment
 };
