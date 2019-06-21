@@ -34,14 +34,13 @@ export default class Product extends Component {
 	}
 
 	componentWillReceiveProps(newProps) {
-		const {unitPrice, quantity} = newProps.product;
-		if (unitPrice.toString() !== this.state.unitPrice || quantity.toString() !== this.state.quantity){
+		const { unitPrice, quantity } = newProps.product;
+		if (unitPrice.toString() !== this.state.unitPrice || quantity.toString() !== this.state.quantity) {
 			let state = this.state;
 			state.unitPrice = unitPrice.toString();
 			state.quantity = quantity.toString();
 			this.setState(state);
 		}
-		
 	}
 
 	_handlePriceBlur() {
@@ -147,6 +146,7 @@ export default class Product extends Component {
 							onBlur={this._handlePriceBlur.bind(this)}
 							selectTextOnFocus
 						/>
+						<Text style={{ color: colors.darkGrey, fontSize: 12, fontWeight: 'bold', marginRight: 5 }}>RON</Text>
 						<Icon name="times" style={styles.timesIcon} />
 						<TextInput
 							style={styles.quantityInput}

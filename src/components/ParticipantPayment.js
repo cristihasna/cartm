@@ -58,6 +58,7 @@ export default class ParticipantPayment extends Component {
 							value={this.state.payed}
 							selectTextOnFocus
 						/>
+						<Text style={[styles.accent, {fontSize: 16, marginLeft: 5, borderBottomWidth: 0}]}>RON</Text>
 					</View>
 				</View>
 			</View>

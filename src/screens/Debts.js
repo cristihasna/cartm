@@ -71,7 +71,10 @@ class Debt extends Component {
 					textStyle={{ fontSize: 18, marginLeft: 0, color: colors.darkPurple }}
 					data={this.props.user}
 				/>
-				<Text style={styles.debtAmount}>{this.props.debt.toFixed(2)}</Text>
+				<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+					<Text style={styles.debtAmount}>{this.props.debt.toFixed(2)}</Text>
+					<Text style={{marginLeft: 5, color: colors.purple}}>RON</Text>
+				</View>
 			</View>
 		);
 		return (

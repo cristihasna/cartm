@@ -52,7 +52,10 @@ const Product = ({ product }) => {
 		<View style={styles.productContainer}>
 			<View style={styles.productTop}>
 				<Text style={styles.productName}>{name}</Text>
-				<Text style={styles.productPrice}>{price.toFixed(2)}</Text>
+				<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+					<Text style={styles.productPrice}>{price.toFixed(2)}</Text>
+					<Text style={{color: colors.purple, marginLeft: 5}}>RON</Text>
+				</View>
 			</View>
 			<View style={styles.productRight}>
 				<Text style={styles.productDesc}>{timeline}</Text>

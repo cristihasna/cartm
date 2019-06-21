@@ -56,6 +56,9 @@ export default ({participant, collapsed, onToggle}) => {
 						<Text style={[ styles.accent, { fontSize: 20, marginLeft: 10 } ]}>
 							{participant.debt.toFixed(2)}
 						</Text>
+						<Text style={[ styles.accent, { fontSize: 18, marginLeft: 10 } ]}>
+							RON
+						</Text>
 					</View>
 				</View>
 			</View>

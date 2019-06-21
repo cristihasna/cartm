@@ -19,6 +19,12 @@ export default ({ products }) => {
 		return dayA < dayB ? -1 : dayA > dayB ? 1 : 0;
 	};
 
+	const isVisible = (i, n) => {
+		const gap = Math.round(n / 7);
+		if ( i % gap === 0) return true;
+		return false;
+	}
+
 	let data = {};
 	if (products)
 		products.forEach((product) => {
@@ -30,7 +36,7 @@ export default ({ products }) => {
 	let graphData = [];
 	for (key in data) graphData.push({ amount: data[key], date: key });
 	graphData.sort(compareFormatedDates);
-	if (graphData.length > 6) graphData = graphData.slice(graphData.length - 6);
+	// if (graphData.length > 6) graphData = graphData.slice(graphData.length - 6);
 
 	const axesSvg = { fontSize: 12, fill: colors.purple };
 	return (
@@ -40,21 +46,21 @@ export default ({ products }) => {
 				style={{ paddingRight: 5, width: 25 }}
 				contentInset={{ top: 10, bottom: 10 }}
 				svg={axesSvg}
-				numberOfTicks={5}
+				numberOfTicks={3}
 			/>
 			<View style={{ flex: 1 }}>
 				<LineChart
 					style={{ flex: 1 }}
 					data={graphData.map((data) => data.amount)}
 					contentInset={{ top: 10, bottom: 10 }}
-					numberOfTicks={5}
+					numberOfTicks={3}
 					svg={{ stroke: colors.purple }}>
 					<Grid svg={{ fill: colors.darkGrey }} />
 				</LineChart>
 				<XAxis
 					style={{ width: 100 + '%', height: 50, marginBottom: -50 }}
 					data={graphData.map((data) => data.amount)}
-					formatLabel={(_, i) => graphData[i].date}
+					formatLabel={(_, i) => isVisible(i, graphData.length) ? graphData[i].date : ''}
 					contentInset={{ left: 15, right: 15 }}
 					svg={{ rotation: 0, ...axesSvg }}
 				/>

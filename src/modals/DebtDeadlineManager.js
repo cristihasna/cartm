@@ -24,7 +24,10 @@ const Product = ({ product }) => {
 		<View style={styles.productContainer}>
 			<View style={styles.productTop}>
 				<Text style={styles.productName}>{name}</Text>
-				<Text style={styles.productPrice}>{(price / product.participants.length).toFixed(2)}</Text>
+				<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+					<Text style={styles.productPrice}>{(price / product.participants.length).toFixed(2)}</Text>
+					<Text style={{ color: colors.purple, marginLeft: 5 }}>RON</Text>
+				</View>
 			</View>
 			<View style={styles.productRight}>
 				{product.participants.length > 1 && <Text style={styles.productDesc}>{description}</Text>}
@@ -47,6 +50,22 @@ export default class DebtDeadlineManager extends Component {
 		this.setState({ visible: false, debt: null, date: null, withDeadline: false });
 	}
 
+	formatDate(referenceDate) {
+		const date = new Date(referenceDate);
+		const now = new Date();
+		const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+		const month = [ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC' ][
+			date.getMonth()
+		];
+		const year = date.getFullYear();
+		timeline = `${day} - ${month} - ${year}`;
+		if (now.getFullYear() === date.getFullYear() && now.getMonth() === date.getMonth()) {
+			if (now.getDate() === date.getDate()) timeline = 'today';
+			else if (now.getDate() - date.getDate() === 1) timeline = 'yesterday';
+		}
+		return timeline;
+	}
+
 	render() {
 		let products = [];
 		let whoOwes = null;
@@ -57,18 +76,8 @@ export default class DebtDeadlineManager extends Component {
 			products = this.state.debt.session.products.filter((product) =>
 				product.participants.includes(this.state.debt.owedBy.email)
 			);
-			const date = new Date(this.state.debt.session.endDate);
-			const now = new Date();
-			const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-			const month = [ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC' ][
-				date.getMonth()
-			];
-			const year = date.getFullYear();
-			timeline = `${day} - ${month} - ${year}`;
-			if (now.getFullYear() === date.getFullYear() && now.getMonth() === date.getMonth()) {
-				if (now.getDate() === date.getDate()) timeline = 'today';
-				else if (now.getDate() - date.getDate() === 1) timeline = 'yesterday';
-			}
+
+			timeline = this.formatDate(this.state.debt.session.endDate);
 
 			// compute who owes who
 			whoOwes = this.state.withDeadline ? (
@@ -120,7 +129,7 @@ export default class DebtDeadlineManager extends Component {
 			) : (
 				<React.Fragment>
 					<Text style={this.state.date ? styles.datePickerText : styles.datePickerPH}>
-						{this.state.date || 'no deadline set'}
+						{this.formatDate(this.state.date) || 'no deadline set'}
 					</Text>
 				</React.Fragment>
 			);
@@ -128,7 +137,12 @@ export default class DebtDeadlineManager extends Component {
 		let modalContent = this.state.debt ? (
 			<View style={styles.contentWrapper}>
 				{whoOwes}
-				<Text style={styles.amount}>{this.state.debt.amount.toFixed(2)}</Text>
+				<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
+					<Text style={styles.amount}>{this.state.debt.amount.toFixed(2)}</Text>
+					<Text style={{ color: colors.purple, marginLeft: 5, width: 50, marginRight: -50, marginBottom: 5 }}>
+						RON
+					</Text>
+				</View>
 				<Text style={[ styles.label, { marginTop: 0 } ]}>{'from ' + timeline}</Text>
 				<View
 					style={[

@@ -90,10 +90,7 @@ export default class AddProductModal extends Component {
 					currentState.name = data.name;
 					currentState.showCamera = false;
 					currentState.barcode = barcode;
-					if (data.image_url)
-						Image.getSize(data.image_url, (offImageW, offImageH) =>
-							this.setState({ offImageW, offImageH })
-						);
+					
 					// fetch other instances of this product, for unit price references
 					const product = await fetchProducts(data.name);
 					if (product) currentState.price = '' + product.unitPrice.toFixed(2);
@@ -161,8 +158,6 @@ export default class AddProductModal extends Component {
 			quantity: '1',
 			openFoodFactsData: undefined,
 			loading: false,
-			offImageH: undefined,
-			offImageW: undefined
 		});
 	}
 
@@ -224,44 +219,21 @@ export default class AddProductModal extends Component {
 	}
 
 	_renderOpenFoodFacts() {
-		const min = (a, b) => (a > b ? b : a);
-		const aspectRatio = this.state.offImageW / this.state.offImageH;
-		let imageW,
-			imageH,
-			flexDirection = 'row',
-			productName = this.state.openFoodFactsData.name;
-		if (!aspectRatio) {
-			imageH = imageW = 0;
-		} else if (aspectRatio > 1.5) {
-			imageH = min((Dimensions.get('window').width - 80) / aspectRatio, 50);
-			imageW = imageH * aspectRatio;
-			flexDirection = 'column';
-		} else if (aspectRatio <= 1.5) {
-			imageH = 120;
-			imageW = imageH * aspectRatio;
-			flexDirection = 'row';
-			if (productName.length > 20)
-				productName = productName.slice(0, 10) + '...' + productName.slice(productName.length - 7);
-		}
-		if (productName.length > 30)
-			productName = productName.slice(0, 20) + '...' + productName.slice(productName.length - 7);
 		const containerStyle = {
-			marginTop: aspectRatio > 1.5 ? 5 : 0,
-			marginLeft: aspectRatio > 1.5 ? 0 : 10,
+			marginLeft: 10,
 			flex: 1,
-			height: 70,
 			flexDirection: 'column'
 		};
 		return (
 			<React.Fragment>
-				<View style={[ styles.offHeader, { flexDirection } ]}>
+				<View style={[ styles.offHeader ]}>
 					<Image
 						source={{ uri: this.state.openFoodFactsData.image_url }}
 						resizeMode={'contain'}
-						style={{ width: imageW, height: imageH }}
+						style={{ width: Dimensions.get('window').width / 4, height: 100, backgroundColor: colors.white }}
 					/>
 					<View style={containerStyle}>
-						<Text style={styles.offName}>{productName}</Text>
+						<Text style={styles.offName}>{this.state.productName}</Text>
 						<View style={styles.offImages}>
 							<Image
 								style={{ height: 50, width: 90 }}
@@ -340,7 +312,14 @@ export default class AddProductModal extends Component {
 							onChangeText={this._handlePriceChange.bind(this)}
 							onBlur={this._handlePriceBlur.bind(this)}
 							keyboardType="numeric"
+							selectTextOnFocus
 						/>
+						<Text style={[styles.inputLabel, {
+							marginLeft: 5,
+							fontSize: 16,
+							color: colors.purple,
+							fontWeight: 'bold'
+						}]}>RON</Text>
 					</View>
 				</View>
 				<View style={styles.inputContainer}>
@@ -425,8 +404,9 @@ const styles = StyleSheet.create({
 	},
 	offHeader: {
 		display: 'flex',
+		flexDirection: 'row',
 		justifyContent: 'flex-start',
-		alignItems: 'flex-start'
+		alignItems: 'center'
 	},
 	offImage: {
 		height: 100,
@@ -434,7 +414,7 @@ const styles = StyleSheet.create({
 	},
 	offImages: {
 		marginTop: 5,
-		display: 'flex',
+		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-between'
 	},
