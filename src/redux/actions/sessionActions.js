@@ -22,7 +22,10 @@ export const createSession = (navigation) => async (dispatch) => {
 	}) /*workaround to save the status code */
 		.then((res) => res.json().then((data) => ({ status: res.status, body: data })))
 		.then((res) => {
-			if (res.status === 201) dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+			if (res.status === 201) {
+				dispatch({ type: UPDATE_SESSION, sessionData: res.body });
+				navigation.navigate('CurrentSession');
+			}
 			else if (res.status === 400) fetchSession(navigation)(dispatch);
 			else throw Error(res.body.message);
 			// set loading false

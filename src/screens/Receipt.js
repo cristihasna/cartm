@@ -57,7 +57,9 @@ class Receipt extends Component {
 					participants = JSON.parse(stringifiedParticipants);
 					this.props.updateReceipt({ products, participants });
 					this.setState({ loading: false });
-				} else this.setState({ loading: false });
+				} else {
+					this.props.resetReceipt();
+					this.setState({ loading: false })};
 			})
 			.catch((err) => {
 				console.log(err);

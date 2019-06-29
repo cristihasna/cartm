@@ -20,7 +20,8 @@ export default ({ products }) => {
 	};
 
 	const isVisible = (i, n) => {
-		const gap = Math.round(n / 7);
+		const gap = Math.floor(n / 7);
+		if (gap === 0) return true;
 		if ( i % gap === 0) return true;
 		return false;
 	}

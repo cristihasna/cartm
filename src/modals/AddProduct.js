@@ -233,7 +233,7 @@ export default class AddProductModal extends Component {
 						style={{ width: Dimensions.get('window').width / 4, height: 100, backgroundColor: colors.white }}
 					/>
 					<View style={containerStyle}>
-						<Text style={styles.offName}>{this.state.productName}</Text>
+						<Text style={styles.offName}>{this.state.name}</Text>
 						<View style={styles.offImages}>
 							<Image
 								style={{ height: 50, width: 90 }}

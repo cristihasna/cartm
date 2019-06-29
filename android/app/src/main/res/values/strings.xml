@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">cartm</string>
+    <string name="app_name">Cart Manager</string>
     <string name="facebook_app_id">384688849034454</string>
     <string name="default_notification_channel_id">fcm_default_channel</string>
     <string name="notification_color">#40407a</string>
