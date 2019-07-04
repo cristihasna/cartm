@@ -39,7 +39,7 @@ export default class ReceiptScanner extends Component {
 		return (
 			<View style={styles.container}>
 				<View style={styles.cameraPreviewContainer}>
-					<Text style={styles.cameraTitle}>Scan the barcode</Text>
+					<Text style={styles.cameraTitle}>Scan the receipt</Text>
 					<View style={styles.cameraContainer}>
 						<RNCamera
 							flashMode={this.state.flashMode}
