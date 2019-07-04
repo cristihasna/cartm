@@ -11,7 +11,15 @@ export default class ProfileSection extends Component {
 				{heading.map((h) => (
 					<View key={h.title} style={styles.headerContainer}>
 						<Text style={styles.title}>{h.title}</Text>
-						{h.right && <Text style={styles.right}>{h.right}</Text>}
+						{h.right && (
+							<View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+								<Text style={styles.right}>{h.right}</Text>
+								<Text
+									style={[ styles.right, { marginLeft: 5, fontSize: 16, fontWeight: 'normal' } ]}>
+									RON
+								</Text>
+							</View>
+						)}
 					</View>
 				))}
 				{this.props.children && (

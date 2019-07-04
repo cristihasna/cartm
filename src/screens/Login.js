@@ -34,15 +34,15 @@ class Login extends Component {
 		ToastAndroid.showWithGravityAndOffset(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM, 0, 20);
 	}
 
-	handleSocialLogin(signinProvider) {
-		this.setState({ loading: true });
+	handleSocialLogin(signinProvider, providerName) {
+		this.setState({ loading: providerName });
 		signinProvider().then((data) => this._loginUser(data)).catch((data) => {
 			console.log(data);
 			if (data.code === 'auth/account-exists-with-different-credential')
 				alert(
 					'Your email address is listed using a different sign in method. Please use the same sign in method'
 				);
-			this.setState({ loading: false });
+			this.setState({ loading: '' });
 		});
 	}
 
@@ -107,16 +107,16 @@ class Login extends Component {
 									title="continue with Facebook"
 									iconName="facebook-f"
 									color={colors.facebookColor}
-									onClick={this.handleSocialLogin.bind(this, facebookLogin)}
-									loading={this.state.loading}
+									onClick={this.handleSocialLogin.bind(this, facebookLogin, 'facebook')}
+									loading={this.state.loading === 'facebook'}
 								/>
 								<SocialLoginButton
 									style={{ marginTop: 10 }}
 									title="continue with Google"
 									iconName="google"
 									color={colors.googleColor}
-									onClick={this.handleSocialLogin.bind(this, googleLogin)}
-									loading={this.state.loading}
+									onClick={this.handleSocialLogin.bind(this, googleLogin, 'google')}
+									loading={this.state.loading === 'google'}
 								/>
 							</View>
 						</View>

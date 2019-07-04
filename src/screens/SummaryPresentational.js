@@ -18,7 +18,8 @@ const SummaryPresentational = ({
 			<View style={styles.contentWrapper}>
 				<View style={styles.totalCostContainer}>
 					<Text style={styles.label}>Total: </Text>
-					<Text style={[ styles.accent, { fontSize: 28 } ]}>{total}</Text>
+					<Text style={[ styles.accent, { fontSize: 28 } ]}>{total.toFixed(2)}</Text>
+					<Text style={[ styles.accent, { fontSize: 20, marginLeft: 5 } ]}>RON</Text>
 				</View>
 				<ScrollView style={styles.participantsContainer}>
 					<View style={{ height: 25 }} />

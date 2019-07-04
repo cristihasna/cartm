@@ -69,9 +69,7 @@ class DrawerContent extends Component {
 					label={'Log out'}
 					iconName={'sign-out-alt'}
 					onPress={this._handleLogout.bind(this)}
-					containerStyle={styles.separatorAfter}
 				/>
-				<DrawerItem label={'Settings'} iconName={'cog'} onPress={() => console.warn('sign out')} />
 			</ScrollView>
 		);
 	}
